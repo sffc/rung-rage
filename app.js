@@ -49,7 +49,7 @@ async.forever(
 
 				// Compute computer move.
 				var hc1 = gameState.hashCode();
-				let computerMove = minimaxComputeMove(gameState);
+				let computerMove = minimaxComputeMove(gameState, 1);
 				var hc2 = gameState.hashCode();
 				if (hc1 !== hc2) {
 					console.error("WARNING: Game state not reset after call to minimaxComputeMove");

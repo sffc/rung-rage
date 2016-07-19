@@ -5,6 +5,6 @@ const minimax = require("../lib/minimax").computeMove;
 
 onmessage = function(e) {
 	var gameState = GameState.fromHashCode(e.data);
-	var computerMove = minimax(gameState);
+	var computerMove = minimax(gameState, 1);
 	postMessage(computerMove);
 }
