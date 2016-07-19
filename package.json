@@ -9,12 +9,16 @@
     "snapsvg": "^0.4.0"
   },
   "devDependencies": {
+    "babel-preset-es2015": "^6.9.0",
     "grunt": "^1.0.1",
-    "grunt-browserify": "^5.0.0"
+    "grunt-babel": "^6.0.0",
+    "grunt-browserify": "^5.0.0",
+    "grunt-contrib-uglify": "^1.0.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Shane F. Carr",
+  "repository": "https://github.com/sffc/rung-rage",
   "license": "ISC"
 }
