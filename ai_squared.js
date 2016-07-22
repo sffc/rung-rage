@@ -4,31 +4,6 @@ const async = require("async");
 const GameState = require("./lib/state").GameState;
 const MinimaxPlayer = require("./lib/minimax").MinimaxPlayer;
 
-function playGame(gameState, player1, player2, next) {
-	
-	var playRound = function(player) {
-		return function(_next) {
-			var isTopPlayersTurn = gameState.isTopPlayersTurn();
-			var gamePlayer = (isTopPlayersTurn ? gameState.p1 : gameState.p2);
-			var move = player.computeMove(gameState);
-			gameState.rungs.setPosition(...move.rungs);
-			gamePlayer.setPosition(...move.player);
-			_next(null, move);
-		};
-	};
-
-	async.series([
-		playRound(player1),
-		playRound(player2),
-		playRound(player1),
-		playRound(player2),
-		playRound(player1),
-		playRound(player2),
-		playRound(player1),
-		playRound(player2)
-	], next);
-}
-
 async.forever(
 	(next) => {
 		var player1 = new MinimaxPlayer();
@@ -52,7 +27,7 @@ async.forever(
 		player2.maxBreadth = 5;
 
 		// Make player2's moves work in favor of the other player:
-		player2.playsReverse = true;
+		// player2.playsReverse = true;
 
 		async.waterfall([
 			(_next) => {
@@ -69,3 +44,30 @@ async.forever(
 		console.error("Error:", err);
 	}
 );
+
+
+
+
+// No need to mess with this part of the code.
+function playGame(gameState, player1, player2, next) {
+	var playRound = function(player) {
+		return function(_next) {
+			var isTopPlayersTurn = gameState.isTopPlayersTurn();
+			var gamePlayer = (isTopPlayersTurn ? gameState.p1 : gameState.p2);
+			var move = player.computeMove(gameState);
+			gameState.rungs.setPosition(...move.rungs);
+			gamePlayer.setPosition(...move.player);
+			_next(null, move);
+		};
+	};
+	async.series([
+		playRound(player1),
+		playRound(player2),
+		playRound(player1),
+		playRound(player2),
+		playRound(player1),
+		playRound(player2),
+		playRound(player1),
+		playRound(player2)
+	], next);
+}
