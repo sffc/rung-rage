@@ -3,12 +3,14 @@
 const readline = require("readline");
 const async = require("async");
 const GameState = require("./lib/state").GameState;
-const minimaxComputeMove = require("./lib/minimax").computeMove;
+const MinimaxPlayer = require("./lib/minimax").MinimaxPlayer;
 
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
+
+const minimax = new MinimaxPlayer();
 
 function promptForMove(next) {
 	console.log("Format: i j pos value");
@@ -22,7 +24,7 @@ function promptForMove(next) {
 	});
 }
 
-var gameState = GameState.getDefault(4);
+var gameState = GameState.createRandom(4);
 console.log(gameState.toString());
 
 async.forever(
@@ -49,13 +51,13 @@ async.forever(
 
 				// Compute computer move.
 				var hc1 = gameState.hashCode();
-				let computerMove = minimaxComputeMove(gameState, 1);
+				let computerMove = minimax.computeMove(gameState);
 				var hc2 = gameState.hashCode();
 				if (hc1 !== hc2) {
 					console.error("WARNING: Game state not reset after call to minimaxComputeMove");
 				}
 				gameState.rungs.setPosition(...computerMove.rungs);
-				gameState.p2.setPosition(...computerMove.p2);
+				gameState.p2.setPosition(...computerMove.player);
 				console.log(gameState.toString());
 				console.log("Current Score: " + gameState.getScore(true));
 
