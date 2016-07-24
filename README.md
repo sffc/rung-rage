@@ -21,7 +21,7 @@ Then follow the prompts to play against the computer.
 A controller for the web UI is available in *lib/controller.js*, with an example usage in *html/index.html*.  In order to run the demo, you first need to compile the JavaScript for browser usage:
 
 	$ npm install
-	$ npm install -g grunt
+	$ npm install -g grunt-cli
 	$ grunt
 
 ## Running Simulations
