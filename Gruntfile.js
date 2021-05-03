@@ -9,8 +9,8 @@ module.exports = function(grunt) {
 		browserify: {
 			dist: {
 				files: {
-					"doc/bundle.js": ["html/main.js"],
-					"doc/bundle_minimax.js": ["html/minimax.js"]
+					"docs/bundle.js": ["html/main.js"],
+					"docs/bundle_minimax.js": ["html/minimax.js"]
 				}
 			}
 		},
@@ -22,8 +22,8 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					"doc/bundle.js": "doc/bundle.js",
-					"doc/bundle_minimax.js": "doc/bundle_minimax.js"
+					"docs/bundle.js": "docs/bundle.js",
+					"docs/bundle_minimax.js": "docs/bundle_minimax.js"
 				}
 			}
 		},
@@ -40,8 +40,8 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					"doc/bundle.js": ["doc/bundle.js"],
-					"doc/bundle_minimax.js": ["doc/bundle_minimax.js"]
+					"docs/bundle.js": ["docs/bundle.js"],
+					"docs/bundle_minimax.js": ["docs/bundle_minimax.js"]
 				}
 			}
 		},
@@ -51,12 +51,12 @@ module.exports = function(grunt) {
 					expand: true,
 					cwd: "html",
 					src: ["*.html"],
-					dest: "doc/"
+					dest: "docs/"
 				}, {
 					expand: true,
 					cwd: "html",
 					src: ["assets/*"],
-					dest: "doc/"
+					dest: "docs/"
 				}]
 			}
 		}
