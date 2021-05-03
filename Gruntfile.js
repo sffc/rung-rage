@@ -9,8 +9,8 @@ module.exports = function(grunt) {
 		browserify: {
 			dist: {
 				files: {
-					"html/bundle.js": ["html/main.js"],
-					"html/bundle_minimax.js": ["html/minimax.js"]
+					"doc/bundle.js": ["html/main.js"],
+					"doc/bundle_minimax.js": ["html/minimax.js"]
 				}
 			}
 		},
@@ -22,8 +22,8 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					"html/bundle.js": "html/bundle.js",
-					"html/bundle_minimax.js": "html/bundle_minimax.js"
+					"doc/bundle.js": "doc/bundle.js",
+					"doc/bundle_minimax.js": "doc/bundle_minimax.js"
 				}
 			}
 		},
@@ -40,14 +40,30 @@ module.exports = function(grunt) {
 			},
 			dist: {
 				files: {
-					"html/bundle.js": ["html/bundle.js"],
-					"html/bundle_minimax.js": ["html/bundle_minimax.js"]
+					"doc/bundle.js": ["doc/bundle.js"],
+					"doc/bundle_minimax.js": ["doc/bundle_minimax.js"]
 				}
+			}
+		},
+		copy: {
+			main: {
+				files: [{
+					expand: true,
+					cwd: "html",
+					src: ["*.html"],
+					dest: "doc/"
+				}, {
+					expand: true,
+					cwd: "html",
+					src: ["assets/*"],
+					dest: "doc/"
+				}]
 			}
 		}
 	});
 	grunt.loadNpmTasks("grunt-browserify");
 	grunt.loadNpmTasks("grunt-babel");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
-	grunt.registerTask("default", ["browserify", "babel", "uglify"]);
+	grunt.loadNpmTasks("grunt-contrib-copy");
+	grunt.registerTask("default", ["browserify", "babel", "uglify", "copy"]);
 };

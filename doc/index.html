@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<head>
+<meta charset="UTF-8">
+<style>
+body{
+	width: 80%;
+	background-color: #5ABBDB;
+	margin: 0 auto;
+	padding: 0;
+	font: 14px/16px Verdana, sans-serif;
+	text-align: center;
+}
+div#main{
+	background-color: #FFF;
+	margin: 0;
+	padding: 10px;
+}
+#game {
+	width: 100%;
+	max-height: 400px;
+}
+</style>
+</head>
+
+<body><div id="main">
+
+<h1>Rung Rage</h1>
+
+<p>You and your opponent both control five bubbles.  Each bubble is connected to an opponent's bubble by following a series of vertical <em>pipes</em> and horizontal <em>rungs</em>.</p>
+
+<p>Initially, all rungs are inactive.  On each turn, you activate a rung and fill in one of your bubbles with a number from 1 to 4.  Each number can be used only once.  When you activate a rung, you will change which bubbles are connected to each other!  Paths from top to bottom will always follow a rung if able.  You cannot activate two rungs that are next to each other in the same row.</p>
+
+<p>The game ends after four rounds.  At the end, you score points equal to the number of paths where the number in your bubble is greater than the number in your opponent's bubble.  Paths with the same number on both ends do not score.  The bubble you don't fill in with a number from 1 to 4 will remain a 0.</p>
+
+<p>Paths marked with a "+" sign give bonus points!  In addition to their normal score, the player who controls a path containing a "+" sign scores an extra point for each "+" sign in the path.</p>
+
+<p>Your opponent is a computer that will try very hard to win.  Your bubbles are on top, and the computer's bubbles are on the bottom.  To take your turn, do two things: click a rung to activate it, and click one of your bubble's to enter a number from 1 to 4.  You can do these in either order.  After you take your turn, the computer will think for a few seconds, and then make its move.</p>
+
+<p>Can you beat the computer at Rung Rage?</p>
+
+<svg id="game"></svg>
+
+<p>The original game design is by Rohan Dargad; learn more <a href="https://www.facebook.com/latticelinegames/">here</a>.  The online implementation is by <a href="http://shane.guru/">Shane Carr</a>.
+
+</div></body>
+
+<script src="bundle.js"></script>
