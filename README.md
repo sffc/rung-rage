@@ -5,7 +5,7 @@ This project contains a virtual implementation of Rung Rage, including a simple 
 
 There are two font-ends: a command line front-end (Node.JS) and a web page.  You can preview the web-based version at the following URL.
 
-http://shane.guru/rung-rage/html/
+https://sffc.github.io/rung-rage/html/index.html
 
 ### Command Line
 
