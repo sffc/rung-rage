@@ -4,7 +4,7 @@
   "description": "An implementation of Rung Rage, including a simple minimax AI player",
   "main": "app.js",
   "dependencies": {
-    "async": "^2.6.3",
+    "async": "^2.6.4",
     "howler": "^1.1.29",
     "snapsvg": "^0.4.0"
   },
