@@ -15,7 +15,7 @@ function _toConsumableArray(arr) {
 var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(obj) {
     return typeof obj;
 } : function(obj) {
-    return obj && "function" == typeof Symbol && obj.constructor === Symbol ? "symbol" : typeof obj;
+    return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 }, _createClass = function() {
     function defineProperties(target, props) {
         for (var i = 0; i < props.length; i++) {
@@ -30,29 +30,32 @@ var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator 
     };
 }();
 
-!function e(t, n, r) {
-    function s(o, u) {
-        if (!n[o]) {
-            if (!t[o]) {
-                var a = "function" == typeof require && require;
-                if (!u && a) return a(o, !0);
-                if (i) return i(o, !0);
-                var f = new Error("Cannot find module '" + o + "'");
-                throw f.code = "MODULE_NOT_FOUND", f;
+!function() {
+    function r(e, n, t) {
+        function o(i, f) {
+            if (!n[i]) {
+                if (!e[i]) {
+                    var c = "function" == typeof require && require;
+                    if (!f && c) return c(i, !0);
+                    if (u) return u(i, !0);
+                    var a = new Error("Cannot find module '" + i + "'");
+                    throw a.code = "MODULE_NOT_FOUND", a;
+                }
+                var p = n[i] = {
+                    exports: {}
+                };
+                e[i][0].call(p.exports, function(r) {
+                    var n = e[i][1][r];
+                    return o(n || r);
+                }, p, p.exports, r, e, n, t);
             }
-            var l = n[o] = {
-                exports: {}
-            };
-            t[o][0].call(l.exports, function(e) {
-                var n = t[o][1][e];
-                return s(n ? n : e);
-            }, l, l.exports, e, t, n, r);
+            return n[i].exports;
         }
-        return n[o].exports;
+        for (var u = "function" == typeof require && require, i = 0; i < t.length; i++) o(t[i]);
+        return o;
     }
-    for (var i = "function" == typeof require && require, o = 0; o < r.length; o++) s(r[o]);
-    return s;
-}({
+    return r;
+}()({
     1: [ function(require, module, exports) {
         var playGame = require("../lib/controller").playGame;
         playGame(4, "#game");
@@ -614,1049 +617,1179 @@ var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator 
         snapsvg: 9
     } ],
     5: [ function(require, module, exports) {
-        (function(process, global) {
-            !function(global, factory) {
-                "object" === ("undefined" == typeof exports ? "undefined" : _typeof(exports)) && "undefined" != typeof module ? factory(exports) : "function" == typeof define && define.amd ? define([ "exports" ], factory) : factory(global.async = global.async || {});
-            }(this, function(exports) {
-                function apply(func, thisArg, args) {
-                    var length = args.length;
-                    switch (length) {
-                      case 0:
-                        return func.call(thisArg);
-
-                      case 1:
-                        return func.call(thisArg, args[0]);
-
-                      case 2:
-                        return func.call(thisArg, args[0], args[1]);
-
-                      case 3:
-                        return func.call(thisArg, args[0], args[1], args[2]);
+        (function(process, global, setImmediate) {
+            (function() {
+                !function(global, factory) {
+                    "object" === ("undefined" == typeof exports ? "undefined" : _typeof(exports)) && "undefined" != typeof module ? factory(exports) : "function" == typeof define && define.amd ? define([ "exports" ], factory) : factory(global.async = global.async || {});
+                }(this, function(exports) {
+                    function slice(arrayLike, start) {
+                        start = 0 | start;
+                        for (var newLen = Math.max(arrayLike.length - start, 0), newArr = Array(newLen), idx = 0; idx < newLen; idx++) newArr[idx] = arrayLike[start + idx];
+                        return newArr;
                     }
-                    return func.apply(thisArg, args);
-                }
-                function isObject(value) {
-                    var type = "undefined" == typeof value ? "undefined" : _typeof(value);
-                    return !!value && ("object" == type || "function" == type);
-                }
-                function isFunction(value) {
-                    var tag = isObject(value) ? objectToString.call(value) : "";
-                    return tag == funcTag || tag == genTag;
-                }
-                function isObjectLike(value) {
-                    return !!value && "object" == ("undefined" == typeof value ? "undefined" : _typeof(value));
-                }
-                function isSymbol(value) {
-                    return "symbol" == ("undefined" == typeof value ? "undefined" : _typeof(value)) || isObjectLike(value) && objectToString$1.call(value) == symbolTag;
-                }
-                function toNumber(value) {
-                    if ("number" == typeof value) return value;
-                    if (isSymbol(value)) return NAN;
-                    if (isObject(value)) {
-                        var other = isFunction(value.valueOf) ? value.valueOf() : value;
-                        value = isObject(other) ? other + "" : other;
+                    function isObject(value) {
+                        var type = "undefined" == typeof value ? "undefined" : _typeof(value);
+                        return null != value && ("object" == type || "function" == type);
                     }
-                    if ("string" != typeof value) return 0 === value ? value : +value;
-                    value = value.replace(reTrim, "");
-                    var isBinary = reIsBinary.test(value);
-                    return isBinary || reIsOctal.test(value) ? freeParseInt(value.slice(2), isBinary ? 2 : 8) : reIsBadHex.test(value) ? NAN : +value;
-                }
-                function toFinite(value) {
-                    if (!value) return 0 === value ? value : 0;
-                    if (value = toNumber(value), value === INFINITY || value === -INFINITY) {
-                        var sign = value < 0 ? -1 : 1;
-                        return sign * MAX_INTEGER;
+                    function fallback(fn) {
+                        setTimeout(fn, 0);
                     }
-                    return value === value ? value : 0;
-                }
-                function toInteger(value) {
-                    var result = toFinite(value), remainder = result % 1;
-                    return result === result ? remainder ? result - remainder : result : 0;
-                }
-                function rest(func, start) {
-                    if ("function" != typeof func) throw new TypeError(FUNC_ERROR_TEXT);
-                    return start = nativeMax(void 0 === start ? func.length - 1 : toInteger(start), 0), 
-                    function() {
-                        for (var args = arguments, index = -1, length = nativeMax(args.length - start, 0), array = Array(length); ++index < length; ) array[index] = args[start + index];
-                        switch (start) {
-                          case 0:
-                            return func.call(this, array);
-
-                          case 1:
-                            return func.call(this, args[0], array);
-
-                          case 2:
-                            return func.call(this, args[0], args[1], array);
-                        }
-                        var otherArgs = Array(start + 1);
-                        for (index = -1; ++index < start; ) otherArgs[index] = args[index];
-                        return otherArgs[start] = array, apply(func, this, otherArgs);
-                    };
-                }
-                function initialParams(fn) {
-                    return rest(function(args) {
-                        var callback = args.pop();
-                        fn.call(this, args, callback);
-                    });
-                }
-                function applyEach$1(eachfn) {
-                    return rest(function(fns, args) {
-                        var go = initialParams(function(args, callback) {
-                            var that = this;
-                            return eachfn(fns, function(fn, cb) {
-                                fn.apply(that, args.concat([ cb ]));
-                            }, callback);
+                    function wrap(defer) {
+                        return function(fn) {
+                            var args = slice(arguments, 1);
+                            defer(function() {
+                                fn.apply(null, args);
+                            });
+                        };
+                    }
+                    function asyncify(func) {
+                        return initialParams(function(args, callback) {
+                            var result;
+                            try {
+                                result = func.apply(this, args);
+                            } catch (e) {
+                                return callback(e);
+                            }
+                            isObject(result) && "function" == typeof result.then ? result.then(function(value) {
+                                invokeCallback(callback, null, value);
+                            }, function(err) {
+                                invokeCallback(callback, err.message ? err : new Error(err));
+                            }) : callback(null, result);
                         });
-                        return args.length ? go.apply(this, args) : go;
-                    });
-                }
-                function noop() {}
-                function once(fn) {
-                    return function() {
-                        if (null !== fn) {
+                    }
+                    function invokeCallback(callback, error, value) {
+                        try {
+                            callback(error, value);
+                        } catch (e) {
+                            setImmediate$1(rethrow, e);
+                        }
+                    }
+                    function rethrow(error) {
+                        throw error;
+                    }
+                    function isAsync(fn) {
+                        return supportsSymbol && "AsyncFunction" === fn[Symbol.toStringTag];
+                    }
+                    function wrapAsync(asyncFn) {
+                        return isAsync(asyncFn) ? asyncify(asyncFn) : asyncFn;
+                    }
+                    function applyEach$1(eachfn) {
+                        return function(fns) {
+                            var args = slice(arguments, 1), go = initialParams(function(args, callback) {
+                                var that = this;
+                                return eachfn(fns, function(fn, cb) {
+                                    wrapAsync(fn).apply(that, args.concat(cb));
+                                }, callback);
+                            });
+                            return args.length ? go.apply(this, args) : go;
+                        };
+                    }
+                    function getRawTag(value) {
+                        var isOwn = hasOwnProperty.call(value, symToStringTag$1), tag = value[symToStringTag$1];
+                        try {
+                            value[symToStringTag$1] = void 0;
+                            var unmasked = !0;
+                        } catch (e) {}
+                        var result = nativeObjectToString.call(value);
+                        return unmasked && (isOwn ? value[symToStringTag$1] = tag : delete value[symToStringTag$1]), 
+                        result;
+                    }
+                    function objectToString(value) {
+                        return nativeObjectToString$1.call(value);
+                    }
+                    function baseGetTag(value) {
+                        return null == value ? void 0 === value ? undefinedTag : nullTag : symToStringTag && symToStringTag in Object(value) ? getRawTag(value) : objectToString(value);
+                    }
+                    function isFunction(value) {
+                        if (!isObject(value)) return !1;
+                        var tag = baseGetTag(value);
+                        return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
+                    }
+                    function isLength(value) {
+                        return "number" == typeof value && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
+                    }
+                    function isArrayLike(value) {
+                        return null != value && isLength(value.length) && !isFunction(value);
+                    }
+                    function noop() {}
+                    function once(fn) {
+                        return function() {
+                            if (null !== fn) {
+                                var callFn = fn;
+                                fn = null, callFn.apply(this, arguments);
+                            }
+                        };
+                    }
+                    function baseTimes(n, iteratee) {
+                        for (var index = -1, result = Array(n); ++index < n; ) result[index] = iteratee(index);
+                        return result;
+                    }
+                    function isObjectLike(value) {
+                        return null != value && "object" == ("undefined" == typeof value ? "undefined" : _typeof(value));
+                    }
+                    function baseIsArguments(value) {
+                        return isObjectLike(value) && baseGetTag(value) == argsTag;
+                    }
+                    function stubFalse() {
+                        return !1;
+                    }
+                    function isIndex(value, length) {
+                        var type = "undefined" == typeof value ? "undefined" : _typeof(value);
+                        return length = null == length ? MAX_SAFE_INTEGER$1 : length, !!length && ("number" == type || "symbol" != type && reIsUint.test(value)) && value > -1 && value % 1 == 0 && value < length;
+                    }
+                    function baseIsTypedArray(value) {
+                        return isObjectLike(value) && isLength(value.length) && !!typedArrayTags[baseGetTag(value)];
+                    }
+                    function baseUnary(func) {
+                        return function(value) {
+                            return func(value);
+                        };
+                    }
+                    function arrayLikeKeys(value, inherited) {
+                        var isArr = isArray(value), isArg = !isArr && isArguments(value), isBuff = !isArr && !isArg && isBuffer(value), isType = !isArr && !isArg && !isBuff && isTypedArray(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes(value.length, String) : [], length = result.length;
+                        for (var key in value) !inherited && !hasOwnProperty$1.call(value, key) || skipIndexes && ("length" == key || isBuff && ("offset" == key || "parent" == key) || isType && ("buffer" == key || "byteLength" == key || "byteOffset" == key) || isIndex(key, length)) || result.push(key);
+                        return result;
+                    }
+                    function isPrototype(value) {
+                        var Ctor = value && value.constructor, proto = "function" == typeof Ctor && Ctor.prototype || objectProto$5;
+                        return value === proto;
+                    }
+                    function overArg(func, transform) {
+                        return function(arg) {
+                            return func(transform(arg));
+                        };
+                    }
+                    function baseKeys(object) {
+                        if (!isPrototype(object)) return nativeKeys(object);
+                        var result = [];
+                        for (var key in Object(object)) hasOwnProperty$3.call(object, key) && "constructor" != key && result.push(key);
+                        return result;
+                    }
+                    function keys(object) {
+                        return isArrayLike(object) ? arrayLikeKeys(object) : baseKeys(object);
+                    }
+                    function createArrayIterator(coll) {
+                        var i = -1, len = coll.length;
+                        return function() {
+                            return ++i < len ? {
+                                value: coll[i],
+                                key: i
+                            } : null;
+                        };
+                    }
+                    function createES2015Iterator(iterator) {
+                        var i = -1;
+                        return function() {
+                            var item = iterator.next();
+                            return item.done ? null : (i++, {
+                                value: item.value,
+                                key: i
+                            });
+                        };
+                    }
+                    function createObjectIterator(obj) {
+                        var okeys = keys(obj), i = -1, len = okeys.length;
+                        return function() {
+                            var key = okeys[++i];
+                            return i < len ? {
+                                value: obj[key],
+                                key: key
+                            } : null;
+                        };
+                    }
+                    function iterator(coll) {
+                        if (isArrayLike(coll)) return createArrayIterator(coll);
+                        var iterator = getIterator(coll);
+                        return iterator ? createES2015Iterator(iterator) : createObjectIterator(coll);
+                    }
+                    function onlyOnce(fn) {
+                        return function() {
+                            if (null === fn) throw new Error("Callback was already called.");
                             var callFn = fn;
                             fn = null, callFn.apply(this, arguments);
-                        }
-                    };
-                }
-                function baseProperty(key) {
-                    return function(object) {
-                        return null == object ? void 0 : object[key];
-                    };
-                }
-                function isLength(value) {
-                    return "number" == typeof value && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER;
-                }
-                function isArrayLike(value) {
-                    return null != value && isLength(getLength(value)) && !isFunction(value);
-                }
-                function getIterator(coll) {
-                    return iteratorSymbol && coll[iteratorSymbol] && coll[iteratorSymbol]();
-                }
-                function getPrototype(value) {
-                    return nativeGetPrototype(Object(value));
-                }
-                function baseHas(object, key) {
-                    return null != object && (hasOwnProperty.call(object, key) || "object" == ("undefined" == typeof object ? "undefined" : _typeof(object)) && key in object && null === getPrototype(object));
-                }
-                function baseKeys(object) {
-                    return nativeKeys(Object(object));
-                }
-                function baseTimes(n, iteratee) {
-                    for (var index = -1, result = Array(n); ++index < n; ) result[index] = iteratee(index);
-                    return result;
-                }
-                function isArrayLikeObject(value) {
-                    return isObjectLike(value) && isArrayLike(value);
-                }
-                function isArguments(value) {
-                    return isArrayLikeObject(value) && hasOwnProperty$1.call(value, "callee") && (!propertyIsEnumerable.call(value, "callee") || objectToString$2.call(value) == argsTag);
-                }
-                function isString(value) {
-                    return "string" == typeof value || !isArray(value) && isObjectLike(value) && objectToString$3.call(value) == stringTag;
-                }
-                function indexKeys(object) {
-                    var length = object ? object.length : void 0;
-                    return isLength(length) && (isArray(object) || isString(object) || isArguments(object)) ? baseTimes(length, String) : null;
-                }
-                function isIndex(value, length) {
-                    return length = null == length ? MAX_SAFE_INTEGER$1 : length, !!length && ("number" == typeof value || reIsUint.test(value)) && value > -1 && value % 1 == 0 && value < length;
-                }
-                function isPrototype(value) {
-                    var Ctor = value && value.constructor, proto = "function" == typeof Ctor && Ctor.prototype || objectProto$5;
-                    return value === proto;
-                }
-                function keys(object) {
-                    var isProto = isPrototype(object);
-                    if (!isProto && !isArrayLike(object)) return baseKeys(object);
-                    var indexes = indexKeys(object), skipIndexes = !!indexes, result = indexes || [], length = result.length;
-                    for (var key in object) !baseHas(object, key) || skipIndexes && ("length" == key || isIndex(key, length)) || isProto && "constructor" == key || result.push(key);
-                    return result;
-                }
-                function iterator(coll) {
-                    var len, i = -1;
-                    if (isArrayLike(coll)) return len = coll.length, function() {
-                        return i++, i < len ? {
-                            value: coll[i],
-                            key: i
-                        } : null;
-                    };
-                    var iterate = getIterator(coll);
-                    if (iterate) return function() {
-                        var item = iterate.next();
-                        return item.done ? null : (i++, {
-                            value: item.value,
-                            key: i
-                        });
-                    };
-                    var okeys = keys(coll);
-                    return len = okeys.length, function() {
-                        i++;
-                        var key = okeys[i];
-                        return i < len ? {
-                            value: coll[key],
-                            key: key
-                        } : null;
-                    };
-                }
-                function onlyOnce(fn) {
-                    return function() {
-                        if (null === fn) throw new Error("Callback was already called.");
-                        var callFn = fn;
-                        fn = null, callFn.apply(this, arguments);
-                    };
-                }
-                function _eachOfLimit(limit) {
-                    return function(obj, iteratee, callback) {
-                        callback = once(callback || noop), obj = obj || [];
-                        var nextElem = iterator(obj);
-                        if (limit <= 0) return callback(null);
-                        var done = !1, running = 0, errored = !1;
-                        !function replenish() {
-                            if (done && running <= 0) return callback(null);
-                            for (;running < limit && !errored; ) {
-                                var elem = nextElem();
-                                if (null === elem) return done = !0, void (running <= 0 && callback(null));
-                                running += 1, iteratee(elem.value, elem.key, onlyOnce(function(err) {
-                                    running -= 1, err ? (callback(err), errored = !0) : replenish();
-                                }));
-                            }
-                        }();
-                    };
-                }
-                function doParallelLimit(fn) {
-                    return function(obj, limit, iteratee, callback) {
-                        return fn(_eachOfLimit(limit), obj, iteratee, callback);
-                    };
-                }
-                function _asyncMap(eachfn, arr, iteratee, callback) {
-                    callback = once(callback || noop), arr = arr || [];
-                    var results = [], counter = 0;
-                    eachfn(arr, function(value, _, callback) {
-                        var index = counter++;
-                        iteratee(value, function(err, v) {
-                            results[index] = v, callback(err);
-                        });
-                    }, function(err) {
-                        callback(err, results);
-                    });
-                }
-                function doLimit(fn, limit) {
-                    return function(iterable, iteratee, callback) {
-                        return fn(iterable, limit, iteratee, callback);
-                    };
-                }
-                function asyncify(func) {
-                    return initialParams(function(args, callback) {
-                        var result;
-                        try {
-                            result = func.apply(this, args);
-                        } catch (e) {
-                            return callback(e);
-                        }
-                        isObject(result) && "function" == typeof result.then ? result.then(function(value) {
-                            callback(null, value);
-                        }, function(err) {
-                            callback(err.message ? err : new Error(err));
-                        }) : callback(null, result);
-                    });
-                }
-                function arrayEach(array, iteratee) {
-                    for (var index = -1, length = array ? array.length : 0; ++index < length && iteratee(array[index], index, array) !== !1; ) ;
-                    return array;
-                }
-                function createBaseFor(fromRight) {
-                    return function(object, iteratee, keysFunc) {
-                        for (var index = -1, iterable = Object(object), props = keysFunc(object), length = props.length; length--; ) {
-                            var key = props[fromRight ? length : ++index];
-                            if (iteratee(iterable[key], key, iterable) === !1) break;
-                        }
-                        return object;
-                    };
-                }
-                function baseForOwn(object, iteratee) {
-                    return object && baseFor(object, iteratee, keys);
-                }
-                function indexOfNaN(array, fromIndex, fromRight) {
-                    for (var length = array.length, index = fromIndex + (fromRight ? 1 : -1); fromRight ? index-- : ++index < length; ) {
-                        var other = array[index];
-                        if (other !== other) return index;
+                        };
                     }
-                    return -1;
-                }
-                function baseIndexOf(array, value, fromIndex) {
-                    if (value !== value) return indexOfNaN(array, fromIndex);
-                    for (var index = fromIndex - 1, length = array.length; ++index < length; ) if (array[index] === value) return index;
-                    return -1;
-                }
-                function auto(tasks, concurrency, callback) {
-                    function enqueueTask(key, task) {
-                        readyTasks.push(function() {
-                            runTask(key, task);
-                        });
-                    }
-                    function processQueue() {
-                        if (0 === readyTasks.length && 0 === runningTasks) return callback(null, results);
-                        for (;readyTasks.length && runningTasks < concurrency; ) {
-                            var run = readyTasks.shift();
-                            run();
-                        }
-                    }
-                    function addListener(taskName, fn) {
-                        var taskListeners = listeners[taskName];
-                        taskListeners || (taskListeners = listeners[taskName] = []), taskListeners.push(fn);
-                    }
-                    function taskComplete(taskName) {
-                        var taskListeners = listeners[taskName] || [];
-                        arrayEach(taskListeners, function(fn) {
-                            fn();
-                        }), processQueue();
-                    }
-                    function runTask(key, task) {
-                        if (!hasError) {
-                            var taskCallback = onlyOnce(rest(function(err, args) {
-                                if (runningTasks--, args.length <= 1 && (args = args[0]), err) {
-                                    var safeResults = {};
-                                    baseForOwn(results, function(val, rkey) {
-                                        safeResults[rkey] = val;
-                                    }), safeResults[key] = args, hasError = !0, listeners = [], callback(err, safeResults);
-                                } else results[key] = args, taskComplete(key);
-                            }));
-                            runningTasks++;
-                            var taskFn = task[task.length - 1];
-                            task.length > 1 ? taskFn(results, taskCallback) : taskFn(taskCallback);
-                        }
-                    }
-                    function checkForDeadlocks() {
-                        for (var currentTask, counter = 0; readyToCheck.length; ) currentTask = readyToCheck.pop(), 
-                        counter++, arrayEach(getDependents(currentTask), function(dependent) {
-                            --uncheckedDependencies[dependent] || readyToCheck.push(dependent);
-                        });
-                        if (counter !== numTasks) throw new Error("async.auto cannot execute tasks due to a recursive dependency");
-                    }
-                    function getDependents(taskName) {
-                        var result = [];
-                        return baseForOwn(tasks, function(task, key) {
-                            isArray(task) && baseIndexOf(task, taskName, 0) >= 0 && result.push(key);
-                        }), result;
-                    }
-                    "function" == typeof concurrency && (callback = concurrency, concurrency = null), 
-                    callback = once(callback || noop);
-                    var keys$$ = keys(tasks), numTasks = keys$$.length;
-                    if (!numTasks) return callback(null);
-                    concurrency || (concurrency = numTasks);
-                    var results = {}, runningTasks = 0, hasError = !1, listeners = {}, readyTasks = [], readyToCheck = [], uncheckedDependencies = {};
-                    baseForOwn(tasks, function(task, key) {
-                        if (!isArray(task)) return enqueueTask(key, [ task ]), void readyToCheck.push(key);
-                        var dependencies = task.slice(0, task.length - 1), remainingDependencies = dependencies.length;
-                        return 0 === remainingDependencies ? (enqueueTask(key, task), void readyToCheck.push(key)) : (uncheckedDependencies[key] = remainingDependencies, 
-                        void arrayEach(dependencies, function(dependencyName) {
-                            if (!tasks[dependencyName]) throw new Error("async.auto task `" + key + "` has a non-existent dependency in " + dependencies.join(", "));
-                            addListener(dependencyName, function() {
-                                remainingDependencies--, 0 === remainingDependencies && enqueueTask(key, task);
-                            });
-                        }));
-                    }), checkForDeadlocks(), processQueue();
-                }
-                function arrayMap(array, iteratee) {
-                    for (var index = -1, length = array ? array.length : 0, result = Array(length); ++index < length; ) result[index] = iteratee(array[index], index, array);
-                    return result;
-                }
-                function copyArray(source, array) {
-                    var index = -1, length = source.length;
-                    for (array || (array = Array(length)); ++index < length; ) array[index] = source[index];
-                    return array;
-                }
-                function checkGlobal(value) {
-                    return value && value.Object === Object ? value : null;
-                }
-                function baseToString(value) {
-                    if ("string" == typeof value) return value;
-                    if (isSymbol(value)) return symbolToString ? symbolToString.call(value) : "";
-                    var result = value + "";
-                    return "0" == result && 1 / value == -INFINITY$1 ? "-0" : result;
-                }
-                function baseSlice(array, start, end) {
-                    var index = -1, length = array.length;
-                    start < 0 && (start = -start > length ? 0 : length + start), end = end > length ? length : end, 
-                    end < 0 && (end += length), length = start > end ? 0 : end - start >>> 0, start >>>= 0;
-                    for (var result = Array(length); ++index < length; ) result[index] = array[index + start];
-                    return result;
-                }
-                function castSlice(array, start, end) {
-                    var length = array.length;
-                    return end = void 0 === end ? length : end, !start && end >= length ? array : baseSlice(array, start, end);
-                }
-                function charsEndIndex(strSymbols, chrSymbols) {
-                    for (var index = strSymbols.length; index-- && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1; ) ;
-                    return index;
-                }
-                function charsStartIndex(strSymbols, chrSymbols) {
-                    for (var index = -1, length = strSymbols.length; ++index < length && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1; ) ;
-                    return index;
-                }
-                function stringToArray(string) {
-                    return string.match(reComplexSymbol);
-                }
-                function toString(value) {
-                    return null == value ? "" : baseToString(value);
-                }
-                function trim(string, chars, guard) {
-                    if (string = toString(string), string && (guard || void 0 === chars)) return string.replace(reTrim$1, "");
-                    if (!string || !(chars = baseToString(chars))) return string;
-                    var strSymbols = stringToArray(string), chrSymbols = stringToArray(chars), start = charsStartIndex(strSymbols, chrSymbols), end = charsEndIndex(strSymbols, chrSymbols) + 1;
-                    return castSlice(strSymbols, start, end).join("");
-                }
-                function parseParams(func) {
-                    return func = func.toString().replace(STRIP_COMMENTS, ""), func = func.match(FN_ARGS)[2].replace(" ", ""), 
-                    func = func ? func.split(FN_ARG_SPLIT) : [], func = func.map(function(arg) {
-                        return trim(arg.replace(FN_ARG, ""));
-                    });
-                }
-                function autoInject(tasks, callback) {
-                    var newTasks = {};
-                    baseForOwn(tasks, function(taskFn, key) {
-                        function newTask(results, taskCb) {
-                            var newArgs = arrayMap(params, function(name) {
-                                return results[name];
-                            });
-                            newArgs.push(taskCb), taskFn.apply(null, newArgs);
-                        }
-                        var params;
-                        if (isArray(taskFn)) params = copyArray(taskFn), taskFn = params.pop(), newTasks[key] = params.concat(params.length > 0 ? newTask : taskFn); else if (1 === taskFn.length) newTasks[key] = taskFn; else {
-                            if (params = parseParams(taskFn), 0 === taskFn.length && 0 === params.length) throw new Error("autoInject task functions require explicit parameters.");
-                            params.pop(), newTasks[key] = params.concat(newTask);
-                        }
-                    }), auto(newTasks, callback);
-                }
-                function fallback(fn) {
-                    setTimeout(fn, 0);
-                }
-                function wrap(defer) {
-                    return rest(function(fn, args) {
-                        defer(function() {
-                            fn.apply(null, args);
-                        });
-                    });
-                }
-                function DLL() {
-                    this.head = this.tail = null, this.length = 0;
-                }
-                function setInitial(dll, node) {
-                    dll.length = 1, dll.head = dll.tail = node;
-                }
-                function queue(worker, concurrency, payload) {
-                    function _insert(data, pos, callback) {
-                        if (null != callback && "function" != typeof callback) throw new Error("task callback must be a function");
-                        return q.started = !0, isArray(data) || (data = [ data ]), 0 === data.length && q.idle() ? setImmediate$1(function() {
-                            q.drain();
-                        }) : (arrayEach(data, function(task) {
-                            var item = {
-                                data: task,
-                                callback: callback || noop
-                            };
-                            pos ? q._tasks.unshift(item) : q._tasks.push(item);
-                        }), void setImmediate$1(q.process));
-                    }
-                    function _next(tasks) {
-                        return rest(function(args) {
-                            workers -= 1, arrayEach(tasks, function(task) {
-                                arrayEach(_workersList, function(worker, index) {
-                                    if (worker === task) return _workersList.splice(index, 1), !1;
-                                }), task.callback.apply(task, args), null != args[0] && q.error(args[0], task.data);
-                            }), workers <= q.concurrency - q.buffer && q.unsaturated(), q.idle() && q.drain(), 
-                            q.process();
-                        });
-                    }
-                    if (null == concurrency) concurrency = 1; else if (0 === concurrency) throw new Error("Concurrency must not be zero");
-                    var workers = 0, _workersList = [], q = {
-                        _tasks: new DLL(),
-                        concurrency: concurrency,
-                        payload: payload,
-                        saturated: noop,
-                        unsaturated: noop,
-                        buffer: concurrency / 4,
-                        empty: noop,
-                        drain: noop,
-                        error: noop,
-                        started: !1,
-                        paused: !1,
-                        push: function(data, callback) {
-                            _insert(data, !1, callback);
-                        },
-                        kill: function() {
-                            q.drain = noop, q._tasks.empty();
-                        },
-                        unshift: function(data, callback) {
-                            _insert(data, !0, callback);
-                        },
-                        process: function() {
-                            for (;!q.paused && workers < q.concurrency && q._tasks.length; ) {
-                                var tasks = [], data = [], l = q._tasks.length;
-                                q.payload && (l = Math.min(l, q.payload));
-                                for (var i = 0; i < l; i++) {
-                                    var node = q._tasks.shift();
-                                    tasks.push(node), data.push(node.data);
+                    function _eachOfLimit(limit) {
+                        return function(obj, iteratee, callback) {
+                            function iterateeCallback(err, value) {
+                                if (running -= 1, err) done = !0, callback(err); else {
+                                    if (value === breakLoop || done && running <= 0) return done = !0, callback(null);
+                                    looping || replenish();
                                 }
-                                0 === q._tasks.length && q.empty(), workers += 1, _workersList.push(tasks[0]), workers === q.concurrency && q.saturated();
-                                var cb = onlyOnce(_next(tasks));
-                                worker(data, cb);
                             }
-                        },
-                        length: function() {
-                            return q._tasks.length;
-                        },
-                        running: function() {
-                            return workers;
-                        },
-                        workersList: function() {
-                            return _workersList;
-                        },
-                        idle: function() {
-                            return q._tasks.length + workers === 0;
-                        },
-                        pause: function() {
-                            q.paused = !0;
-                        },
-                        resume: function() {
-                            if (q.paused !== !1) {
-                                q.paused = !1;
-                                for (var resumeCount = Math.min(q.concurrency, q._tasks.length), w = 1; w <= resumeCount; w++) setImmediate$1(q.process);
+                            function replenish() {
+                                for (looping = !0; running < limit && !done; ) {
+                                    var elem = nextElem();
+                                    if (null === elem) return done = !0, void (running <= 0 && callback(null));
+                                    running += 1, iteratee(elem.value, elem.key, onlyOnce(iterateeCallback));
+                                }
+                                looping = !1;
                             }
+                            if (callback = once(callback || noop), limit <= 0 || !obj) return callback(null);
+                            var nextElem = iterator(obj), done = !1, running = 0, looping = !1;
+                            replenish();
+                        };
+                    }
+                    function eachOfLimit(coll, limit, iteratee, callback) {
+                        _eachOfLimit(limit)(coll, wrapAsync(iteratee), callback);
+                    }
+                    function doLimit(fn, limit) {
+                        return function(iterable, iteratee, callback) {
+                            return fn(iterable, limit, iteratee, callback);
+                        };
+                    }
+                    function eachOfArrayLike(coll, iteratee, callback) {
+                        function iteratorCallback(err, value) {
+                            err ? callback(err) : ++completed !== length && value !== breakLoop || callback(null);
                         }
-                    };
-                    return q;
-                }
-                function cargo(worker, payload) {
-                    return queue(worker, 1, payload);
-                }
-                function eachOfLimit(coll, limit, iteratee, callback) {
-                    _eachOfLimit(limit)(coll, iteratee, callback);
-                }
-                function reduce(coll, memo, iteratee, callback) {
-                    callback = once(callback || noop), eachOfSeries(coll, function(x, i, callback) {
-                        iteratee(memo, x, function(err, v) {
-                            memo = v, callback(err);
-                        });
-                    }, function(err) {
-                        callback(err, memo);
-                    });
-                }
-                function concat$1(eachfn, arr, fn, callback) {
-                    var result = [];
-                    eachfn(arr, function(x, index, cb) {
-                        fn(x, function(err, y) {
-                            result = result.concat(y || []), cb(err);
-                        });
-                    }, function(err) {
-                        callback(err, result);
-                    });
-                }
-                function doParallel(fn) {
-                    return function(obj, iteratee, callback) {
-                        return fn(eachOf, obj, iteratee, callback);
-                    };
-                }
-                function doSeries(fn) {
-                    return function(obj, iteratee, callback) {
-                        return fn(eachOfSeries, obj, iteratee, callback);
-                    };
-                }
-                function identity(value) {
-                    return value;
-                }
-                function _createTester(eachfn, check, getResult) {
-                    return function(arr, limit, iteratee, cb) {
-                        function done(err) {
-                            cb && (err ? cb(err) : cb(null, getResult(!1)));
-                        }
-                        function wrappedIteratee(x, _, callback) {
-                            return cb ? void iteratee(x, function(err, v) {
-                                cb && (err ? (cb(err), cb = iteratee = !1) : check(v) && (cb(null, getResult(!0, x)), 
-                                cb = iteratee = !1)), callback();
-                            }) : callback();
-                        }
-                        arguments.length > 3 ? (cb = cb || noop, eachfn(arr, limit, wrappedIteratee, done)) : (cb = iteratee, 
-                        cb = cb || noop, iteratee = limit, eachfn(arr, wrappedIteratee, done));
-                    };
-                }
-                function _findGetResult(v, x) {
-                    return x;
-                }
-                function consoleFunc(name) {
-                    return rest(function(fn, args) {
-                        fn.apply(null, args.concat([ rest(function(err, args) {
-                            "object" === ("undefined" == typeof console ? "undefined" : _typeof(console)) && (err ? console.error && console.error(err) : console[name] && arrayEach(args, function(x) {
-                                console[name](x);
-                            }));
-                        }) ]));
-                    });
-                }
-                function doDuring(fn, test, callback) {
-                    function check(err, truth) {
-                        return err ? callback(err) : truth ? void fn(next) : callback(null);
+                        callback = once(callback || noop);
+                        var index = 0, completed = 0, length = coll.length;
+                        for (0 === length && callback(null); index < length; index++) iteratee(coll[index], index, onlyOnce(iteratorCallback));
                     }
-                    callback = onlyOnce(callback || noop);
-                    var next = rest(function(err, args) {
-                        return err ? callback(err) : (args.push(check), void test.apply(this, args));
-                    });
-                    check(null, !0);
-                }
-                function doWhilst(iteratee, test, callback) {
-                    callback = onlyOnce(callback || noop);
-                    var next = rest(function(err, args) {
-                        return err ? callback(err) : test.apply(this, args) ? iteratee(next) : void callback.apply(null, [ null ].concat(args));
-                    });
-                    iteratee(next);
-                }
-                function doUntil(fn, test, callback) {
-                    doWhilst(fn, function() {
-                        return !test.apply(this, arguments);
-                    }, callback);
-                }
-                function during(test, fn, callback) {
-                    function next(err) {
-                        return err ? callback(err) : void test(check);
+                    function doParallel(fn) {
+                        return function(obj, iteratee, callback) {
+                            return fn(eachOf, obj, wrapAsync(iteratee), callback);
+                        };
                     }
-                    function check(err, truth) {
-                        return err ? callback(err) : truth ? void fn(next) : callback(null);
-                    }
-                    callback = onlyOnce(callback || noop), test(check);
-                }
-                function _withoutIndex(iteratee) {
-                    return function(value, index, callback) {
-                        return iteratee(value, callback);
-                    };
-                }
-                function eachLimit(coll, limit, iteratee, callback) {
-                    _eachOfLimit(limit)(coll, _withoutIndex(iteratee), callback);
-                }
-                function ensureAsync(fn) {
-                    return initialParams(function(args, callback) {
-                        var sync = !0;
-                        args.push(function() {
-                            var innerArgs = arguments;
-                            sync ? setImmediate$1(function() {
-                                callback.apply(null, innerArgs);
-                            }) : callback.apply(null, innerArgs);
-                        }), fn.apply(this, args), sync = !1;
-                    });
-                }
-                function notId(v) {
-                    return !v;
-                }
-                function _filter(eachfn, arr, iteratee, callback) {
-                    callback = once(callback || noop);
-                    var results = [];
-                    eachfn(arr, function(x, index, callback) {
-                        iteratee(x, function(err, v) {
-                            err ? callback(err) : (v && results.push({
-                                index: index,
-                                value: x
-                            }), callback());
-                        });
-                    }, function(err) {
-                        err ? callback(err) : callback(null, arrayMap(results.sort(function(a, b) {
-                            return a.index - b.index;
-                        }), baseProperty("value")));
-                    });
-                }
-                function forever(fn, errback) {
-                    function next(err) {
-                        return err ? done(err) : void task(next);
-                    }
-                    var done = onlyOnce(errback || noop), task = ensureAsync(fn);
-                    next();
-                }
-                function mapValuesLimit(obj, limit, iteratee, callback) {
-                    callback = once(callback || noop);
-                    var newObj = {};
-                    eachOfLimit(obj, limit, function(val, key, next) {
-                        iteratee(val, key, function(err, result) {
-                            return err ? next(err) : (newObj[key] = result, void next());
-                        });
-                    }, function(err) {
-                        callback(err, newObj);
-                    });
-                }
-                function has(obj, key) {
-                    return key in obj;
-                }
-                function memoize(fn, hasher) {
-                    var memo = Object.create(null), queues = Object.create(null);
-                    hasher = hasher || identity;
-                    var memoized = initialParams(function(args, callback) {
-                        var key = hasher.apply(null, args);
-                        has(memo, key) ? setImmediate$1(function() {
-                            callback.apply(null, memo[key]);
-                        }) : has(queues, key) ? queues[key].push(callback) : (queues[key] = [ callback ], 
-                        fn.apply(null, args.concat([ rest(function(args) {
-                            memo[key] = args;
-                            var q = queues[key];
-                            delete queues[key];
-                            for (var i = 0, l = q.length; i < l; i++) q[i].apply(null, args);
-                        }) ])));
-                    });
-                    return memoized.memo = memo, memoized.unmemoized = fn, memoized;
-                }
-                function _parallel(eachfn, tasks, callback) {
-                    callback = callback || noop;
-                    var results = isArrayLike(tasks) ? [] : {};
-                    eachfn(tasks, function(task, key, callback) {
-                        task(rest(function(err, args) {
-                            args.length <= 1 && (args = args[0]), results[key] = args, callback(err);
-                        }));
-                    }, function(err) {
-                        callback(err, results);
-                    });
-                }
-                function parallelLimit(tasks, limit, callback) {
-                    _parallel(_eachOfLimit(limit), tasks, callback);
-                }
-                function queue$1(worker, concurrency) {
-                    return queue(function(items, cb) {
-                        worker(items[0], cb);
-                    }, concurrency, 1);
-                }
-                function priorityQueue(worker, concurrency) {
-                    var q = queue$1(worker, concurrency);
-                    return q.push = function(data, priority, callback) {
-                        if (null == callback && (callback = noop), "function" != typeof callback) throw new Error("task callback must be a function");
-                        if (q.started = !0, isArray(data) || (data = [ data ]), 0 === data.length) return setImmediate$1(function() {
-                            q.drain();
-                        });
-                        priority = priority || 0;
-                        for (var nextNode = q._tasks.head; nextNode && priority >= nextNode.priority; ) nextNode = nextNode.next;
-                        arrayEach(data, function(task) {
-                            var item = {
-                                data: task,
-                                priority: priority,
-                                callback: callback
-                            };
-                            nextNode ? q._tasks.insertBefore(nextNode, item) : q._tasks.push(item);
-                        }), setImmediate$1(q.process);
-                    }, delete q.unshift, q;
-                }
-                function race(tasks, callback) {
-                    return callback = once(callback || noop), isArray(tasks) ? tasks.length ? void arrayEach(tasks, function(task) {
-                        task(callback);
-                    }) : callback() : callback(new TypeError("First argument to race must be an array of functions"));
-                }
-                function reduceRight(array, memo, iteratee, callback) {
-                    var reversed = slice.call(array).reverse();
-                    reduce(reversed, memo, iteratee, callback);
-                }
-                function reflect(fn) {
-                    return initialParams(function(args, reflectCallback) {
-                        return args.push(rest(function(err, cbArgs) {
-                            if (err) reflectCallback(null, {
-                                error: err
-                            }); else {
-                                var value = null;
-                                1 === cbArgs.length ? value = cbArgs[0] : cbArgs.length > 1 && (value = cbArgs), 
-                                reflectCallback(null, {
-                                    value: value
-                                });
-                            }
-                        })), fn.apply(this, args);
-                    });
-                }
-                function reject$1(eachfn, arr, iteratee, callback) {
-                    _filter(eachfn, arr, function(value, cb) {
-                        iteratee(value, function(err, v) {
-                            err ? cb(err) : cb(null, !v);
-                        });
-                    }, callback);
-                }
-                function reflectAll(tasks) {
-                    var results;
-                    return isArray(tasks) ? results = arrayMap(tasks, reflect) : (results = {}, baseForOwn(tasks, function(task, key) {
-                        results[key] = reflect.call(this, task);
-                    })), results;
-                }
-                function constant$1(value) {
-                    return function() {
-                        return value;
-                    };
-                }
-                function retry(opts, task, callback) {
-                    function parseTimes(acc, t) {
-                        if ("object" === ("undefined" == typeof t ? "undefined" : _typeof(t))) acc.times = +t.times || DEFAULT_TIMES, 
-                        acc.intervalFunc = "function" == typeof t.interval ? t.interval : constant$1(+t.interval || DEFAULT_INTERVAL); else {
-                            if ("number" != typeof t && "string" != typeof t) throw new Error("Invalid arguments for async.retry");
-                            acc.times = +t || DEFAULT_TIMES;
-                        }
-                    }
-                    function retryAttempt() {
-                        task(function(err) {
-                            err && attempt++ < options.times ? setTimeout(retryAttempt, options.intervalFunc(attempt)) : callback.apply(null, arguments);
-                        });
-                    }
-                    var DEFAULT_TIMES = 5, DEFAULT_INTERVAL = 0, options = {
-                        times: DEFAULT_TIMES,
-                        intervalFunc: constant$1(DEFAULT_INTERVAL)
-                    };
-                    if (arguments.length < 3 && "function" == typeof opts ? (callback = task || noop, 
-                    task = opts) : (parseTimes(options, opts), callback = callback || noop), "function" != typeof task) throw new Error("Invalid arguments for async.retry");
-                    var attempt = 1;
-                    retryAttempt();
-                }
-                function retryable(opts, task) {
-                    return task || (task = opts, opts = null), initialParams(function(args, callback) {
-                        function taskFn(cb) {
-                            task.apply(null, args.concat([ cb ]));
-                        }
-                        opts ? retry(opts, taskFn, callback) : retry(taskFn, callback);
-                    });
-                }
-                function series(tasks, callback) {
-                    _parallel(eachOfSeries, tasks, callback);
-                }
-                function sortBy(coll, iteratee, callback) {
-                    function comparator(left, right) {
-                        var a = left.criteria, b = right.criteria;
-                        return a < b ? -1 : a > b ? 1 : 0;
-                    }
-                    map(coll, function(x, callback) {
-                        iteratee(x, function(err, criteria) {
-                            return err ? callback(err) : void callback(null, {
-                                value: x,
-                                criteria: criteria
+                    function _asyncMap(eachfn, arr, iteratee, callback) {
+                        callback = callback || noop, arr = arr || [];
+                        var results = [], counter = 0, _iteratee = wrapAsync(iteratee);
+                        eachfn(arr, function(value, _, callback) {
+                            var index = counter++;
+                            _iteratee(value, function(err, v) {
+                                results[index] = v, callback(err);
                             });
+                        }, function(err) {
+                            callback(err, results);
                         });
-                    }, function(err, results) {
-                        return err ? callback(err) : void callback(null, arrayMap(results.sort(comparator), baseProperty("value")));
-                    });
-                }
-                function timeout(asyncFn, milliseconds, info) {
-                    function injectedCallback() {
-                        timedOut || (originalCallback.apply(null, arguments), clearTimeout(timer));
                     }
-                    function timeoutCallback() {
-                        var name = asyncFn.name || "anonymous", error = new Error('Callback function "' + name + '" timed out.');
-                        error.code = "ETIMEDOUT", info && (error.info = info), timedOut = !0, originalCallback(error);
+                    function doParallelLimit(fn) {
+                        return function(obj, limit, iteratee, callback) {
+                            return fn(_eachOfLimit(limit), obj, wrapAsync(iteratee), callback);
+                        };
                     }
-                    var originalCallback, timer, timedOut = !1;
-                    return initialParams(function(args, origCallback) {
-                        originalCallback = origCallback, timer = setTimeout(timeoutCallback, milliseconds), 
-                        asyncFn.apply(null, args.concat(injectedCallback));
-                    });
-                }
-                function baseRange(start, end, step, fromRight) {
-                    for (var index = -1, length = nativeMax$1(nativeCeil((end - start) / (step || 1)), 0), result = Array(length); length--; ) result[fromRight ? length : ++index] = start, 
-                    start += step;
-                    return result;
-                }
-                function timeLimit(count, limit, iteratee, callback) {
-                    mapLimit(baseRange(0, count, 1), limit, iteratee, callback);
-                }
-                function transform(coll, accumulator, iteratee, callback) {
-                    3 === arguments.length && (callback = iteratee, iteratee = accumulator, accumulator = isArray(coll) ? [] : {}), 
-                    callback = once(callback || noop), eachOf(coll, function(v, k, cb) {
-                        iteratee(accumulator, v, k, cb);
-                    }, function(err) {
-                        callback(err, accumulator);
-                    });
-                }
-                function unmemoize(fn) {
-                    return function() {
-                        return (fn.unmemoized || fn).apply(null, arguments);
-                    };
-                }
-                function whilst(test, iteratee, callback) {
-                    if (callback = onlyOnce(callback || noop), !test()) return callback(null);
-                    var next = rest(function(err, args) {
-                        return err ? callback(err) : test() ? iteratee(next) : void callback.apply(null, [ null ].concat(args));
-                    });
-                    iteratee(next);
-                }
-                function until(test, fn, callback) {
-                    whilst(function() {
-                        return !test.apply(this, arguments);
-                    }, fn, callback);
-                }
-                function waterfall(tasks, callback) {
-                    function nextTask(args) {
-                        if (taskIndex === tasks.length) return callback.apply(null, [ null ].concat(args));
-                        var taskCallback = onlyOnce(rest(function(err, args) {
-                            return err ? callback.apply(null, [ err ].concat(args)) : void nextTask(args);
-                        }));
-                        args.push(taskCallback);
-                        var task = tasks[taskIndex++];
-                        task.apply(null, args);
+                    function arrayEach(array, iteratee) {
+                        for (var index = -1, length = null == array ? 0 : array.length; ++index < length && iteratee(array[index], index, array) !== !1; ) ;
+                        return array;
                     }
-                    if (callback = once(callback || noop), !isArray(tasks)) return callback(new Error("First argument to waterfall must be an array of functions"));
-                    if (!tasks.length) return callback();
-                    var taskIndex = 0;
-                    nextTask([]);
-                }
-                var _defer, funcTag = "[object Function]", genTag = "[object GeneratorFunction]", objectProto = Object.prototype, objectToString = objectProto.toString, symbolTag = "[object Symbol]", objectProto$1 = Object.prototype, objectToString$1 = objectProto$1.toString, NAN = NaN, reTrim = /^\s+|\s+$/g, reIsBadHex = /^[-+]0x[0-9a-f]+$/i, reIsBinary = /^0b[01]+$/i, reIsOctal = /^0o[0-7]+$/i, freeParseInt = parseInt, INFINITY = 1 / 0, MAX_INTEGER = 1.7976931348623157e308, FUNC_ERROR_TEXT = "Expected a function", nativeMax = Math.max, getLength = baseProperty("length"), MAX_SAFE_INTEGER = 9007199254740991, iteratorSymbol = "function" == typeof Symbol && Symbol.iterator, nativeGetPrototype = Object.getPrototypeOf, objectProto$2 = Object.prototype, hasOwnProperty = objectProto$2.hasOwnProperty, nativeKeys = Object.keys, argsTag = "[object Arguments]", objectProto$3 = Object.prototype, hasOwnProperty$1 = objectProto$3.hasOwnProperty, objectToString$2 = objectProto$3.toString, propertyIsEnumerable = objectProto$3.propertyIsEnumerable, isArray = Array.isArray, stringTag = "[object String]", objectProto$4 = Object.prototype, objectToString$3 = objectProto$4.toString, MAX_SAFE_INTEGER$1 = 9007199254740991, reIsUint = /^(?:0|[1-9]\d*)$/, objectProto$5 = Object.prototype, mapLimit = doParallelLimit(_asyncMap), map = doLimit(mapLimit, 1 / 0), applyEach = applyEach$1(map), mapSeries = doLimit(mapLimit, 1), applyEachSeries = applyEach$1(mapSeries), apply$1 = rest(function(fn, args) {
-                    return rest(function(callArgs) {
-                        return fn.apply(null, args.concat(callArgs));
-                    });
-                }), baseFor = createBaseFor(), freeGlobal = checkGlobal("object" == ("undefined" == typeof global ? "undefined" : _typeof(global)) && global), freeSelf = checkGlobal("object" == ("undefined" == typeof self ? "undefined" : _typeof(self)) && self), thisGlobal = checkGlobal("object" == _typeof(this) && this), root = freeGlobal || freeSelf || thisGlobal || Function("return this")(), Symbol$1 = root.Symbol, INFINITY$1 = 1 / 0, symbolProto = Symbol$1 ? Symbol$1.prototype : void 0, symbolToString = symbolProto ? symbolProto.toString : void 0, rsAstralRange = "\\ud800-\\udfff", rsComboMarksRange = "\\u0300-\\u036f\\ufe20-\\ufe23", rsComboSymbolsRange = "\\u20d0-\\u20f0", rsVarRange = "\\ufe0e\\ufe0f", rsAstral = "[" + rsAstralRange + "]", rsCombo = "[" + rsComboMarksRange + rsComboSymbolsRange + "]", rsFitz = "\\ud83c[\\udffb-\\udfff]", rsModifier = "(?:" + rsCombo + "|" + rsFitz + ")", rsNonAstral = "[^" + rsAstralRange + "]", rsRegional = "(?:\\ud83c[\\udde6-\\uddff]){2}", rsSurrPair = "[\\ud800-\\udbff][\\udc00-\\udfff]", rsZWJ = "\\u200d", reOptMod = rsModifier + "?", rsOptVar = "[" + rsVarRange + "]?", rsOptJoin = "(?:" + rsZWJ + "(?:" + [ rsNonAstral, rsRegional, rsSurrPair ].join("|") + ")" + rsOptVar + reOptMod + ")*", rsSeq = rsOptVar + reOptMod + rsOptJoin, rsSymbol = "(?:" + [ rsNonAstral + rsCombo + "?", rsCombo, rsRegional, rsSurrPair, rsAstral ].join("|") + ")", reComplexSymbol = RegExp(rsFitz + "(?=" + rsFitz + ")|" + rsSymbol + rsSeq, "g"), reTrim$1 = /^\s+|\s+$/g, FN_ARGS = /^(function)?\s*[^\(]*\(\s*([^\)]*)\)/m, FN_ARG_SPLIT = /,/, FN_ARG = /(=.+)?(\s*)$/, STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm, hasSetImmediate = "function" == typeof setImmediate && setImmediate, hasNextTick = "object" === ("undefined" == typeof process ? "undefined" : _typeof(process)) && "function" == typeof process.nextTick;
-                _defer = hasSetImmediate ? setImmediate : hasNextTick ? process.nextTick : fallback;
-                var setImmediate$1 = wrap(_defer);
-                DLL.prototype.removeLink = function(node) {
-                    return node.prev ? node.prev.next = node.next : this.head = node.next, node.next ? node.next.prev = node.prev : this.tail = node.prev, 
-                    node.prev = node.next = null, this.length -= 1, node;
-                }, DLL.prototype.empty = DLL, DLL.prototype.insertAfter = function(node, newNode) {
-                    newNode.prev = node, newNode.next = node.next, node.next ? node.next.prev = newNode : this.tail = newNode, 
-                    node.next = newNode, this.length += 1;
-                }, DLL.prototype.insertBefore = function(node, newNode) {
-                    newNode.prev = node.prev, newNode.next = node, node.prev ? node.prev.next = newNode : this.head = newNode, 
-                    node.prev = newNode, this.length += 1;
-                }, DLL.prototype.unshift = function(node) {
-                    this.head ? this.insertBefore(this.head, node) : setInitial(this, node);
-                }, DLL.prototype.push = function(node) {
-                    this.tail ? this.insertAfter(this.tail, node) : setInitial(this, node);
-                }, DLL.prototype.shift = function() {
-                    return this.head && this.removeLink(this.head);
-                }, DLL.prototype.pop = function() {
-                    return this.tail && this.removeLink(this.tail);
-                };
-                var _defer$1, eachOfSeries = doLimit(eachOfLimit, 1), seq = rest(function(functions) {
-                    return rest(function(args) {
-                        var that = this, cb = args[args.length - 1];
-                        "function" == typeof cb ? args.pop() : cb = noop, reduce(functions, args, function(newargs, fn, cb) {
-                            fn.apply(that, newargs.concat([ rest(function(err, nextargs) {
-                                cb(err, nextargs);
-                            }) ]));
+                    function createBaseFor(fromRight) {
+                        return function(object, iteratee, keysFunc) {
+                            for (var index = -1, iterable = Object(object), props = keysFunc(object), length = props.length; length--; ) {
+                                var key = props[fromRight ? length : ++index];
+                                if (iteratee(iterable[key], key, iterable) === !1) break;
+                            }
+                            return object;
+                        };
+                    }
+                    function baseForOwn(object, iteratee) {
+                        return object && baseFor(object, iteratee, keys);
+                    }
+                    function baseFindIndex(array, predicate, fromIndex, fromRight) {
+                        for (var length = array.length, index = fromIndex + (fromRight ? 1 : -1); fromRight ? index-- : ++index < length; ) if (predicate(array[index], index, array)) return index;
+                        return -1;
+                    }
+                    function baseIsNaN(value) {
+                        return value !== value;
+                    }
+                    function strictIndexOf(array, value, fromIndex) {
+                        for (var index = fromIndex - 1, length = array.length; ++index < length; ) if (array[index] === value) return index;
+                        return -1;
+                    }
+                    function baseIndexOf(array, value, fromIndex) {
+                        return value === value ? strictIndexOf(array, value, fromIndex) : baseFindIndex(array, baseIsNaN, fromIndex);
+                    }
+                    function arrayMap(array, iteratee) {
+                        for (var index = -1, length = null == array ? 0 : array.length, result = Array(length); ++index < length; ) result[index] = iteratee(array[index], index, array);
+                        return result;
+                    }
+                    function isSymbol(value) {
+                        return "symbol" == ("undefined" == typeof value ? "undefined" : _typeof(value)) || isObjectLike(value) && baseGetTag(value) == symbolTag;
+                    }
+                    function baseToString(value) {
+                        if ("string" == typeof value) return value;
+                        if (isArray(value)) return arrayMap(value, baseToString) + "";
+                        if (isSymbol(value)) return symbolToString ? symbolToString.call(value) : "";
+                        var result = value + "";
+                        return "0" == result && 1 / value == -INFINITY ? "-0" : result;
+                    }
+                    function baseSlice(array, start, end) {
+                        var index = -1, length = array.length;
+                        start < 0 && (start = -start > length ? 0 : length + start), end = end > length ? length : end, 
+                        end < 0 && (end += length), length = start > end ? 0 : end - start >>> 0, start >>>= 0;
+                        for (var result = Array(length); ++index < length; ) result[index] = array[index + start];
+                        return result;
+                    }
+                    function castSlice(array, start, end) {
+                        var length = array.length;
+                        return end = void 0 === end ? length : end, !start && end >= length ? array : baseSlice(array, start, end);
+                    }
+                    function charsEndIndex(strSymbols, chrSymbols) {
+                        for (var index = strSymbols.length; index-- && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1; ) ;
+                        return index;
+                    }
+                    function charsStartIndex(strSymbols, chrSymbols) {
+                        for (var index = -1, length = strSymbols.length; ++index < length && baseIndexOf(chrSymbols, strSymbols[index], 0) > -1; ) ;
+                        return index;
+                    }
+                    function asciiToArray(string) {
+                        return string.split("");
+                    }
+                    function hasUnicode(string) {
+                        return reHasUnicode.test(string);
+                    }
+                    function unicodeToArray(string) {
+                        return string.match(reUnicode) || [];
+                    }
+                    function stringToArray(string) {
+                        return hasUnicode(string) ? unicodeToArray(string) : asciiToArray(string);
+                    }
+                    function toString(value) {
+                        return null == value ? "" : baseToString(value);
+                    }
+                    function trim(string, chars, guard) {
+                        if (string = toString(string), string && (guard || void 0 === chars)) return string.replace(reTrim, "");
+                        if (!string || !(chars = baseToString(chars))) return string;
+                        var strSymbols = stringToArray(string), chrSymbols = stringToArray(chars), start = charsStartIndex(strSymbols, chrSymbols), end = charsEndIndex(strSymbols, chrSymbols) + 1;
+                        return castSlice(strSymbols, start, end).join("");
+                    }
+                    function parseParams(func) {
+                        return func = func.toString().replace(STRIP_COMMENTS, ""), func = func.match(FN_ARGS)[2].replace(" ", ""), 
+                        func = func ? func.split(FN_ARG_SPLIT) : [], func = func.map(function(arg) {
+                            return trim(arg.replace(FN_ARG, ""));
+                        });
+                    }
+                    function autoInject(tasks, callback) {
+                        var newTasks = {};
+                        baseForOwn(tasks, function(taskFn, key) {
+                            function newTask(results, taskCb) {
+                                var newArgs = arrayMap(params, function(name) {
+                                    return results[name];
+                                });
+                                newArgs.push(taskCb), wrapAsync(taskFn).apply(null, newArgs);
+                            }
+                            var params, fnIsAsync = isAsync(taskFn), hasNoDeps = !fnIsAsync && 1 === taskFn.length || fnIsAsync && 0 === taskFn.length;
+                            if (isArray(taskFn)) params = taskFn.slice(0, -1), taskFn = taskFn[taskFn.length - 1], 
+                            newTasks[key] = params.concat(params.length > 0 ? newTask : taskFn); else if (hasNoDeps) newTasks[key] = taskFn; else {
+                                if (params = parseParams(taskFn), 0 === taskFn.length && !fnIsAsync && 0 === params.length) throw new Error("autoInject task functions require explicit parameters.");
+                                fnIsAsync || params.pop(), newTasks[key] = params.concat(newTask);
+                            }
+                        }), auto(newTasks, callback);
+                    }
+                    function DLL() {
+                        this.head = this.tail = null, this.length = 0;
+                    }
+                    function setInitial(dll, node) {
+                        dll.length = 1, dll.head = dll.tail = node;
+                    }
+                    function queue(worker, concurrency, payload) {
+                        function _insert(data, insertAtFront, callback) {
+                            if (null != callback && "function" != typeof callback) throw new Error("task callback must be a function");
+                            if (q.started = !0, isArray(data) || (data = [ data ]), 0 === data.length && q.idle()) return setImmediate$1(function() {
+                                q.drain();
+                            });
+                            for (var i = 0, l = data.length; i < l; i++) {
+                                var item = {
+                                    data: data[i],
+                                    callback: callback || noop
+                                };
+                                insertAtFront ? q._tasks.unshift(item) : q._tasks.push(item);
+                            }
+                            processingScheduled || (processingScheduled = !0, setImmediate$1(function() {
+                                processingScheduled = !1, q.process();
+                            }));
+                        }
+                        function _next(tasks) {
+                            return function(err) {
+                                numRunning -= 1;
+                                for (var i = 0, l = tasks.length; i < l; i++) {
+                                    var task = tasks[i], index = baseIndexOf(_workersList, task, 0);
+                                    0 === index ? _workersList.shift() : index > 0 && _workersList.splice(index, 1), 
+                                    task.callback.apply(task, arguments), null != err && q.error(err, task.data);
+                                }
+                                numRunning <= q.concurrency - q.buffer && q.unsaturated(), q.idle() && q.drain(), 
+                                q.process();
+                            };
+                        }
+                        if (null == concurrency) concurrency = 1; else if (0 === concurrency) throw new Error("Concurrency must not be zero");
+                        var _worker = wrapAsync(worker), numRunning = 0, _workersList = [], processingScheduled = !1, isProcessing = !1, q = {
+                            _tasks: new DLL(),
+                            concurrency: concurrency,
+                            payload: payload,
+                            saturated: noop,
+                            unsaturated: noop,
+                            buffer: concurrency / 4,
+                            empty: noop,
+                            drain: noop,
+                            error: noop,
+                            started: !1,
+                            paused: !1,
+                            push: function(data, callback) {
+                                _insert(data, !1, callback);
+                            },
+                            kill: function() {
+                                q.drain = noop, q._tasks.empty();
+                            },
+                            unshift: function(data, callback) {
+                                _insert(data, !0, callback);
+                            },
+                            remove: function(testFn) {
+                                q._tasks.remove(testFn);
+                            },
+                            process: function() {
+                                if (!isProcessing) {
+                                    for (isProcessing = !0; !q.paused && numRunning < q.concurrency && q._tasks.length; ) {
+                                        var tasks = [], data = [], l = q._tasks.length;
+                                        q.payload && (l = Math.min(l, q.payload));
+                                        for (var i = 0; i < l; i++) {
+                                            var node = q._tasks.shift();
+                                            tasks.push(node), _workersList.push(node), data.push(node.data);
+                                        }
+                                        numRunning += 1, 0 === q._tasks.length && q.empty(), numRunning === q.concurrency && q.saturated();
+                                        var cb = onlyOnce(_next(tasks));
+                                        _worker(data, cb);
+                                    }
+                                    isProcessing = !1;
+                                }
+                            },
+                            length: function() {
+                                return q._tasks.length;
+                            },
+                            running: function() {
+                                return numRunning;
+                            },
+                            workersList: function() {
+                                return _workersList;
+                            },
+                            idle: function() {
+                                return q._tasks.length + numRunning === 0;
+                            },
+                            pause: function() {
+                                q.paused = !0;
+                            },
+                            resume: function() {
+                                q.paused !== !1 && (q.paused = !1, setImmediate$1(q.process));
+                            }
+                        };
+                        return q;
+                    }
+                    function cargo(worker, payload) {
+                        return queue(worker, 1, payload);
+                    }
+                    function reduce(coll, memo, iteratee, callback) {
+                        callback = once(callback || noop);
+                        var _iteratee = wrapAsync(iteratee);
+                        eachOfSeries(coll, function(x, i, callback) {
+                            _iteratee(memo, x, function(err, v) {
+                                memo = v, callback(err);
+                            });
+                        }, function(err) {
+                            callback(err, memo);
+                        });
+                    }
+                    function seq() {
+                        var _functions = arrayMap(arguments, wrapAsync);
+                        return function() {
+                            var args = slice(arguments), that = this, cb = args[args.length - 1];
+                            "function" == typeof cb ? args.pop() : cb = noop, reduce(_functions, args, function(newargs, fn, cb) {
+                                fn.apply(that, newargs.concat(function(err) {
+                                    var nextargs = slice(arguments, 1);
+                                    cb(err, nextargs);
+                                }));
+                            }, function(err, results) {
+                                cb.apply(that, [ err ].concat(results));
+                            });
+                        };
+                    }
+                    function identity(value) {
+                        return value;
+                    }
+                    function _createTester(check, getResult) {
+                        return function(eachfn, arr, iteratee, cb) {
+                            cb = cb || noop;
+                            var testResult, testPassed = !1;
+                            eachfn(arr, function(value, _, callback) {
+                                iteratee(value, function(err, result) {
+                                    err ? callback(err) : check(result) && !testResult ? (testPassed = !0, testResult = getResult(!0, value), 
+                                    callback(null, breakLoop)) : callback();
+                                });
+                            }, function(err) {
+                                err ? cb(err) : cb(null, testPassed ? testResult : getResult(!1));
+                            });
+                        };
+                    }
+                    function _findGetResult(v, x) {
+                        return x;
+                    }
+                    function consoleFunc(name) {
+                        return function(fn) {
+                            var args = slice(arguments, 1);
+                            args.push(function(err) {
+                                var args = slice(arguments, 1);
+                                "object" === ("undefined" == typeof console ? "undefined" : _typeof(console)) && (err ? console.error && console.error(err) : console[name] && arrayEach(args, function(x) {
+                                    console[name](x);
+                                }));
+                            }), wrapAsync(fn).apply(null, args);
+                        };
+                    }
+                    function doDuring(fn, test, callback) {
+                        function next(err) {
+                            if (err) return callback(err);
+                            var args = slice(arguments, 1);
+                            args.push(check), _test.apply(this, args);
+                        }
+                        function check(err, truth) {
+                            return err ? callback(err) : truth ? void _fn(next) : callback(null);
+                        }
+                        callback = onlyOnce(callback || noop);
+                        var _fn = wrapAsync(fn), _test = wrapAsync(test);
+                        check(null, !0);
+                    }
+                    function doWhilst(iteratee, test, callback) {
+                        callback = onlyOnce(callback || noop);
+                        var _iteratee = wrapAsync(iteratee), next = function next(err) {
+                            if (err) return callback(err);
+                            var args = slice(arguments, 1);
+                            return test.apply(this, args) ? _iteratee(next) : void callback.apply(null, [ null ].concat(args));
+                        };
+                        _iteratee(next);
+                    }
+                    function doUntil(iteratee, test, callback) {
+                        doWhilst(iteratee, function() {
+                            return !test.apply(this, arguments);
+                        }, callback);
+                    }
+                    function during(test, fn, callback) {
+                        function next(err) {
+                            return err ? callback(err) : void _test(check);
+                        }
+                        function check(err, truth) {
+                            return err ? callback(err) : truth ? void _fn(next) : callback(null);
+                        }
+                        callback = onlyOnce(callback || noop);
+                        var _fn = wrapAsync(fn), _test = wrapAsync(test);
+                        _test(check);
+                    }
+                    function _withoutIndex(iteratee) {
+                        return function(value, index, callback) {
+                            return iteratee(value, callback);
+                        };
+                    }
+                    function eachLimit(coll, iteratee, callback) {
+                        eachOf(coll, _withoutIndex(wrapAsync(iteratee)), callback);
+                    }
+                    function eachLimit$1(coll, limit, iteratee, callback) {
+                        _eachOfLimit(limit)(coll, _withoutIndex(wrapAsync(iteratee)), callback);
+                    }
+                    function ensureAsync(fn) {
+                        return isAsync(fn) ? fn : initialParams(function(args, callback) {
+                            var sync = !0;
+                            args.push(function() {
+                                var innerArgs = arguments;
+                                sync ? setImmediate$1(function() {
+                                    callback.apply(null, innerArgs);
+                                }) : callback.apply(null, innerArgs);
+                            }), fn.apply(this, args), sync = !1;
+                        });
+                    }
+                    function notId(v) {
+                        return !v;
+                    }
+                    function baseProperty(key) {
+                        return function(object) {
+                            return null == object ? void 0 : object[key];
+                        };
+                    }
+                    function filterArray(eachfn, arr, iteratee, callback) {
+                        var truthValues = new Array(arr.length);
+                        eachfn(arr, function(x, index, callback) {
+                            iteratee(x, function(err, v) {
+                                truthValues[index] = !!v, callback(err);
+                            });
+                        }, function(err) {
+                            if (err) return callback(err);
+                            for (var results = [], i = 0; i < arr.length; i++) truthValues[i] && results.push(arr[i]);
+                            callback(null, results);
+                        });
+                    }
+                    function filterGeneric(eachfn, coll, iteratee, callback) {
+                        var results = [];
+                        eachfn(coll, function(x, index, callback) {
+                            iteratee(x, function(err, v) {
+                                err ? callback(err) : (v && results.push({
+                                    index: index,
+                                    value: x
+                                }), callback());
+                            });
+                        }, function(err) {
+                            err ? callback(err) : callback(null, arrayMap(results.sort(function(a, b) {
+                                return a.index - b.index;
+                            }), baseProperty("value")));
+                        });
+                    }
+                    function _filter(eachfn, coll, iteratee, callback) {
+                        var filter = isArrayLike(coll) ? filterArray : filterGeneric;
+                        filter(eachfn, coll, wrapAsync(iteratee), callback || noop);
+                    }
+                    function forever(fn, errback) {
+                        function next(err) {
+                            return err ? done(err) : void task(next);
+                        }
+                        var done = onlyOnce(errback || noop), task = wrapAsync(ensureAsync(fn));
+                        next();
+                    }
+                    function mapValuesLimit(obj, limit, iteratee, callback) {
+                        callback = once(callback || noop);
+                        var newObj = {}, _iteratee = wrapAsync(iteratee);
+                        eachOfLimit(obj, limit, function(val, key, next) {
+                            _iteratee(val, key, function(err, result) {
+                                return err ? next(err) : (newObj[key] = result, void next());
+                            });
+                        }, function(err) {
+                            callback(err, newObj);
+                        });
+                    }
+                    function has(obj, key) {
+                        return key in obj;
+                    }
+                    function memoize(fn, hasher) {
+                        var memo = Object.create(null), queues = Object.create(null);
+                        hasher = hasher || identity;
+                        var _fn = wrapAsync(fn), memoized = initialParams(function(args, callback) {
+                            var key = hasher.apply(null, args);
+                            has(memo, key) ? setImmediate$1(function() {
+                                callback.apply(null, memo[key]);
+                            }) : has(queues, key) ? queues[key].push(callback) : (queues[key] = [ callback ], 
+                            _fn.apply(null, args.concat(function() {
+                                var args = slice(arguments);
+                                memo[key] = args;
+                                var q = queues[key];
+                                delete queues[key];
+                                for (var i = 0, l = q.length; i < l; i++) q[i].apply(null, args);
+                            })));
+                        });
+                        return memoized.memo = memo, memoized.unmemoized = fn, memoized;
+                    }
+                    function _parallel(eachfn, tasks, callback) {
+                        callback = callback || noop;
+                        var results = isArrayLike(tasks) ? [] : {};
+                        eachfn(tasks, function(task, key, callback) {
+                            wrapAsync(task)(function(err, result) {
+                                arguments.length > 2 && (result = slice(arguments, 1)), results[key] = result, callback(err);
+                            });
+                        }, function(err) {
+                            callback(err, results);
+                        });
+                    }
+                    function parallelLimit(tasks, callback) {
+                        _parallel(eachOf, tasks, callback);
+                    }
+                    function parallelLimit$1(tasks, limit, callback) {
+                        _parallel(_eachOfLimit(limit), tasks, callback);
+                    }
+                    function race(tasks, callback) {
+                        if (callback = once(callback || noop), !isArray(tasks)) return callback(new TypeError("First argument to race must be an array of functions"));
+                        if (!tasks.length) return callback();
+                        for (var i = 0, l = tasks.length; i < l; i++) wrapAsync(tasks[i])(callback);
+                    }
+                    function reduceRight(array, memo, iteratee, callback) {
+                        var reversed = slice(array).reverse();
+                        reduce(reversed, memo, iteratee, callback);
+                    }
+                    function reflect(fn) {
+                        var _fn = wrapAsync(fn);
+                        return initialParams(function(args, reflectCallback) {
+                            return args.push(function(error, cbArg) {
+                                if (error) reflectCallback(null, {
+                                    error: error
+                                }); else {
+                                    var value;
+                                    value = arguments.length <= 2 ? cbArg : slice(arguments, 1), reflectCallback(null, {
+                                        value: value
+                                    });
+                                }
+                            }), _fn.apply(this, args);
+                        });
+                    }
+                    function reflectAll(tasks) {
+                        var results;
+                        return isArray(tasks) ? results = arrayMap(tasks, reflect) : (results = {}, baseForOwn(tasks, function(task, key) {
+                            results[key] = reflect.call(this, task);
+                        })), results;
+                    }
+                    function reject$1(eachfn, arr, iteratee, callback) {
+                        _filter(eachfn, arr, function(value, cb) {
+                            iteratee(value, function(err, v) {
+                                cb(err, !v);
+                            });
+                        }, callback);
+                    }
+                    function constant$1(value) {
+                        return function() {
+                            return value;
+                        };
+                    }
+                    function retry(opts, task, callback) {
+                        function parseTimes(acc, t) {
+                            if ("object" === ("undefined" == typeof t ? "undefined" : _typeof(t))) acc.times = +t.times || DEFAULT_TIMES, 
+                            acc.intervalFunc = "function" == typeof t.interval ? t.interval : constant$1(+t.interval || DEFAULT_INTERVAL), 
+                            acc.errorFilter = t.errorFilter; else {
+                                if ("number" != typeof t && "string" != typeof t) throw new Error("Invalid arguments for async.retry");
+                                acc.times = +t || DEFAULT_TIMES;
+                            }
+                        }
+                        function retryAttempt() {
+                            _task(function(err) {
+                                err && attempt++ < options.times && ("function" != typeof options.errorFilter || options.errorFilter(err)) ? setTimeout(retryAttempt, options.intervalFunc(attempt)) : callback.apply(null, arguments);
+                            });
+                        }
+                        var DEFAULT_TIMES = 5, DEFAULT_INTERVAL = 0, options = {
+                            times: DEFAULT_TIMES,
+                            intervalFunc: constant$1(DEFAULT_INTERVAL)
+                        };
+                        if (arguments.length < 3 && "function" == typeof opts ? (callback = task || noop, 
+                        task = opts) : (parseTimes(options, opts), callback = callback || noop), "function" != typeof task) throw new Error("Invalid arguments for async.retry");
+                        var _task = wrapAsync(task), attempt = 1;
+                        retryAttempt();
+                    }
+                    function series(tasks, callback) {
+                        _parallel(eachOfSeries, tasks, callback);
+                    }
+                    function sortBy(coll, iteratee, callback) {
+                        function comparator(left, right) {
+                            var a = left.criteria, b = right.criteria;
+                            return a < b ? -1 : a > b ? 1 : 0;
+                        }
+                        var _iteratee = wrapAsync(iteratee);
+                        map(coll, function(x, callback) {
+                            _iteratee(x, function(err, criteria) {
+                                return err ? callback(err) : void callback(null, {
+                                    value: x,
+                                    criteria: criteria
+                                });
+                            });
                         }, function(err, results) {
-                            cb.apply(that, [ err ].concat(results));
+                            return err ? callback(err) : void callback(null, arrayMap(results.sort(comparator), baseProperty("value")));
                         });
+                    }
+                    function timeout(asyncFn, milliseconds, info) {
+                        var fn = wrapAsync(asyncFn);
+                        return initialParams(function(args, callback) {
+                            function timeoutCallback() {
+                                var name = asyncFn.name || "anonymous", error = new Error('Callback function "' + name + '" timed out.');
+                                error.code = "ETIMEDOUT", info && (error.info = info), timedOut = !0, callback(error);
+                            }
+                            var timer, timedOut = !1;
+                            args.push(function() {
+                                timedOut || (callback.apply(null, arguments), clearTimeout(timer));
+                            }), timer = setTimeout(timeoutCallback, milliseconds), fn.apply(null, args);
+                        });
+                    }
+                    function baseRange(start, end, step, fromRight) {
+                        for (var index = -1, length = nativeMax(nativeCeil((end - start) / (step || 1)), 0), result = Array(length); length--; ) result[fromRight ? length : ++index] = start, 
+                        start += step;
+                        return result;
+                    }
+                    function timeLimit(count, limit, iteratee, callback) {
+                        var _iteratee = wrapAsync(iteratee);
+                        mapLimit(baseRange(0, count, 1), limit, _iteratee, callback);
+                    }
+                    function transform(coll, accumulator, iteratee, callback) {
+                        arguments.length <= 3 && (callback = iteratee, iteratee = accumulator, accumulator = isArray(coll) ? [] : {}), 
+                        callback = once(callback || noop);
+                        var _iteratee = wrapAsync(iteratee);
+                        eachOf(coll, function(v, k, cb) {
+                            _iteratee(accumulator, v, k, cb);
+                        }, function(err) {
+                            callback(err, accumulator);
+                        });
+                    }
+                    function tryEach(tasks, callback) {
+                        var result, error = null;
+                        callback = callback || noop, eachSeries(tasks, function(task, callback) {
+                            wrapAsync(task)(function(err, res) {
+                                result = arguments.length > 2 ? slice(arguments, 1) : res, error = err, callback(!err);
+                            });
+                        }, function() {
+                            callback(error, result);
+                        });
+                    }
+                    function unmemoize(fn) {
+                        return function() {
+                            return (fn.unmemoized || fn).apply(null, arguments);
+                        };
+                    }
+                    function whilst(test, iteratee, callback) {
+                        callback = onlyOnce(callback || noop);
+                        var _iteratee = wrapAsync(iteratee);
+                        if (!test()) return callback(null);
+                        var next = function next(err) {
+                            if (err) return callback(err);
+                            if (test()) return _iteratee(next);
+                            var args = slice(arguments, 1);
+                            callback.apply(null, [ null ].concat(args));
+                        };
+                        _iteratee(next);
+                    }
+                    function until(test, iteratee, callback) {
+                        whilst(function() {
+                            return !test.apply(this, arguments);
+                        }, iteratee, callback);
+                    }
+                    var _defer, apply = function(fn) {
+                        var args = slice(arguments, 1);
+                        return function() {
+                            var callArgs = slice(arguments);
+                            return fn.apply(null, args.concat(callArgs));
+                        };
+                    }, initialParams = function(fn) {
+                        return function() {
+                            var args = slice(arguments), callback = args.pop();
+                            fn.call(this, args, callback);
+                        };
+                    }, hasSetImmediate = "function" == typeof setImmediate && setImmediate, hasNextTick = "object" === ("undefined" == typeof process ? "undefined" : _typeof(process)) && "function" == typeof process.nextTick;
+                    _defer = hasSetImmediate ? setImmediate : hasNextTick ? process.nextTick : fallback;
+                    var setImmediate$1 = wrap(_defer), supportsSymbol = "function" == typeof Symbol, freeGlobal = "object" == ("undefined" == typeof global ? "undefined" : _typeof(global)) && global && global.Object === Object && global, freeSelf = "object" == ("undefined" == typeof self ? "undefined" : _typeof(self)) && self && self.Object === Object && self, root = freeGlobal || freeSelf || Function("return this")(), Symbol$1 = root.Symbol, objectProto = Object.prototype, hasOwnProperty = objectProto.hasOwnProperty, nativeObjectToString = objectProto.toString, symToStringTag$1 = Symbol$1 ? Symbol$1.toStringTag : void 0, objectProto$1 = Object.prototype, nativeObjectToString$1 = objectProto$1.toString, nullTag = "[object Null]", undefinedTag = "[object Undefined]", symToStringTag = Symbol$1 ? Symbol$1.toStringTag : void 0, asyncTag = "[object AsyncFunction]", funcTag = "[object Function]", genTag = "[object GeneratorFunction]", proxyTag = "[object Proxy]", MAX_SAFE_INTEGER = 9007199254740991, breakLoop = {}, iteratorSymbol = "function" == typeof Symbol && Symbol.iterator, getIterator = function(coll) {
+                        return iteratorSymbol && coll[iteratorSymbol] && coll[iteratorSymbol]();
+                    }, argsTag = "[object Arguments]", objectProto$3 = Object.prototype, hasOwnProperty$2 = objectProto$3.hasOwnProperty, propertyIsEnumerable = objectProto$3.propertyIsEnumerable, isArguments = baseIsArguments(function() {
+                        return arguments;
+                    }()) ? baseIsArguments : function(value) {
+                        return isObjectLike(value) && hasOwnProperty$2.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
+                    }, isArray = Array.isArray, freeExports = "object" == ("undefined" == typeof exports ? "undefined" : _typeof(exports)) && exports && !exports.nodeType && exports, freeModule = freeExports && "object" == ("undefined" == typeof module ? "undefined" : _typeof(module)) && module && !module.nodeType && module, moduleExports = freeModule && freeModule.exports === freeExports, Buffer = moduleExports ? root.Buffer : void 0, nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0, isBuffer = nativeIsBuffer || stubFalse, MAX_SAFE_INTEGER$1 = 9007199254740991, reIsUint = /^(?:0|[1-9]\d*)$/, argsTag$1 = "[object Arguments]", arrayTag = "[object Array]", boolTag = "[object Boolean]", dateTag = "[object Date]", errorTag = "[object Error]", funcTag$1 = "[object Function]", mapTag = "[object Map]", numberTag = "[object Number]", objectTag = "[object Object]", regexpTag = "[object RegExp]", setTag = "[object Set]", stringTag = "[object String]", weakMapTag = "[object WeakMap]", arrayBufferTag = "[object ArrayBuffer]", dataViewTag = "[object DataView]", float32Tag = "[object Float32Array]", float64Tag = "[object Float64Array]", int8Tag = "[object Int8Array]", int16Tag = "[object Int16Array]", int32Tag = "[object Int32Array]", uint8Tag = "[object Uint8Array]", uint8ClampedTag = "[object Uint8ClampedArray]", uint16Tag = "[object Uint16Array]", uint32Tag = "[object Uint32Array]", typedArrayTags = {};
+                    typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = !0, 
+                    typedArrayTags[argsTag$1] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag$1] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = !1;
+                    var freeExports$1 = "object" == ("undefined" == typeof exports ? "undefined" : _typeof(exports)) && exports && !exports.nodeType && exports, freeModule$1 = freeExports$1 && "object" == ("undefined" == typeof module ? "undefined" : _typeof(module)) && module && !module.nodeType && module, moduleExports$1 = freeModule$1 && freeModule$1.exports === freeExports$1, freeProcess = moduleExports$1 && freeGlobal.process, nodeUtil = function() {
+                        try {
+                            var types = freeModule$1 && freeModule$1.require && freeModule$1.require("util").types;
+                            return types ? types : freeProcess && freeProcess.binding && freeProcess.binding("util");
+                        } catch (e) {}
+                    }(), nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray, isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray, objectProto$2 = Object.prototype, hasOwnProperty$1 = objectProto$2.hasOwnProperty, objectProto$5 = Object.prototype, nativeKeys = overArg(Object.keys, Object), objectProto$4 = Object.prototype, hasOwnProperty$3 = objectProto$4.hasOwnProperty, eachOfGeneric = doLimit(eachOfLimit, 1 / 0), eachOf = function(coll, iteratee, callback) {
+                        var eachOfImplementation = isArrayLike(coll) ? eachOfArrayLike : eachOfGeneric;
+                        eachOfImplementation(coll, wrapAsync(iteratee), callback);
+                    }, map = doParallel(_asyncMap), applyEach = applyEach$1(map), mapLimit = doParallelLimit(_asyncMap), mapSeries = doLimit(mapLimit, 1), applyEachSeries = applyEach$1(mapSeries), baseFor = createBaseFor(), auto = function(tasks, concurrency, callback) {
+                        function enqueueTask(key, task) {
+                            readyTasks.push(function() {
+                                runTask(key, task);
+                            });
+                        }
+                        function processQueue() {
+                            if (0 === readyTasks.length && 0 === runningTasks) return callback(null, results);
+                            for (;readyTasks.length && runningTasks < concurrency; ) {
+                                var run = readyTasks.shift();
+                                run();
+                            }
+                        }
+                        function addListener(taskName, fn) {
+                            var taskListeners = listeners[taskName];
+                            taskListeners || (taskListeners = listeners[taskName] = []), taskListeners.push(fn);
+                        }
+                        function taskComplete(taskName) {
+                            var taskListeners = listeners[taskName] || [];
+                            arrayEach(taskListeners, function(fn) {
+                                fn();
+                            }), processQueue();
+                        }
+                        function runTask(key, task) {
+                            if (!hasError) {
+                                var taskCallback = onlyOnce(function(err, result) {
+                                    if (runningTasks--, arguments.length > 2 && (result = slice(arguments, 1)), err) {
+                                        var safeResults = {};
+                                        baseForOwn(results, function(val, rkey) {
+                                            safeResults[rkey] = val;
+                                        }), safeResults[key] = result, hasError = !0, listeners = Object.create(null), callback(err, safeResults);
+                                    } else results[key] = result, taskComplete(key);
+                                });
+                                runningTasks++;
+                                var taskFn = wrapAsync(task[task.length - 1]);
+                                task.length > 1 ? taskFn(results, taskCallback) : taskFn(taskCallback);
+                            }
+                        }
+                        function checkForDeadlocks() {
+                            for (var currentTask, counter = 0; readyToCheck.length; ) currentTask = readyToCheck.pop(), 
+                            counter++, arrayEach(getDependents(currentTask), function(dependent) {
+                                0 === --uncheckedDependencies[dependent] && readyToCheck.push(dependent);
+                            });
+                            if (counter !== numTasks) throw new Error("async.auto cannot execute tasks due to a recursive dependency");
+                        }
+                        function getDependents(taskName) {
+                            var result = [];
+                            return baseForOwn(tasks, function(task, key) {
+                                isArray(task) && baseIndexOf(task, taskName, 0) >= 0 && result.push(key);
+                            }), result;
+                        }
+                        "function" == typeof concurrency && (callback = concurrency, concurrency = null), 
+                        callback = once(callback || noop);
+                        var keys$$1 = keys(tasks), numTasks = keys$$1.length;
+                        if (!numTasks) return callback(null);
+                        concurrency || (concurrency = numTasks);
+                        var results = {}, runningTasks = 0, hasError = !1, listeners = Object.create(null), readyTasks = [], readyToCheck = [], uncheckedDependencies = {};
+                        baseForOwn(tasks, function(task, key) {
+                            if (!isArray(task)) return enqueueTask(key, [ task ]), void readyToCheck.push(key);
+                            var dependencies = task.slice(0, task.length - 1), remainingDependencies = dependencies.length;
+                            return 0 === remainingDependencies ? (enqueueTask(key, task), void readyToCheck.push(key)) : (uncheckedDependencies[key] = remainingDependencies, 
+                            void arrayEach(dependencies, function(dependencyName) {
+                                if (!tasks[dependencyName]) throw new Error("async.auto task `" + key + "` has a non-existent dependency `" + dependencyName + "` in " + dependencies.join(", "));
+                                addListener(dependencyName, function() {
+                                    remainingDependencies--, 0 === remainingDependencies && enqueueTask(key, task);
+                                });
+                            }));
+                        }), checkForDeadlocks(), processQueue();
+                    }, symbolTag = "[object Symbol]", INFINITY = 1 / 0, symbolProto = Symbol$1 ? Symbol$1.prototype : void 0, symbolToString = symbolProto ? symbolProto.toString : void 0, rsAstralRange = "\\ud800-\\udfff", rsComboMarksRange = "\\u0300-\\u036f", reComboHalfMarksRange = "\\ufe20-\\ufe2f", rsComboSymbolsRange = "\\u20d0-\\u20ff", rsComboRange = rsComboMarksRange + reComboHalfMarksRange + rsComboSymbolsRange, rsVarRange = "\\ufe0e\\ufe0f", rsZWJ = "\\u200d", reHasUnicode = RegExp("[" + rsZWJ + rsAstralRange + rsComboRange + rsVarRange + "]"), rsAstralRange$1 = "\\ud800-\\udfff", rsComboMarksRange$1 = "\\u0300-\\u036f", reComboHalfMarksRange$1 = "\\ufe20-\\ufe2f", rsComboSymbolsRange$1 = "\\u20d0-\\u20ff", rsComboRange$1 = rsComboMarksRange$1 + reComboHalfMarksRange$1 + rsComboSymbolsRange$1, rsVarRange$1 = "\\ufe0e\\ufe0f", rsAstral = "[" + rsAstralRange$1 + "]", rsCombo = "[" + rsComboRange$1 + "]", rsFitz = "\\ud83c[\\udffb-\\udfff]", rsModifier = "(?:" + rsCombo + "|" + rsFitz + ")", rsNonAstral = "[^" + rsAstralRange$1 + "]", rsRegional = "(?:\\ud83c[\\udde6-\\uddff]){2}", rsSurrPair = "[\\ud800-\\udbff][\\udc00-\\udfff]", rsZWJ$1 = "\\u200d", reOptMod = rsModifier + "?", rsOptVar = "[" + rsVarRange$1 + "]?", rsOptJoin = "(?:" + rsZWJ$1 + "(?:" + [ rsNonAstral, rsRegional, rsSurrPair ].join("|") + ")" + rsOptVar + reOptMod + ")*", rsSeq = rsOptVar + reOptMod + rsOptJoin, rsSymbol = "(?:" + [ rsNonAstral + rsCombo + "?", rsCombo, rsRegional, rsSurrPair, rsAstral ].join("|") + ")", reUnicode = RegExp(rsFitz + "(?=" + rsFitz + ")|" + rsSymbol + rsSeq, "g"), reTrim = /^\s+|\s+$/g, FN_ARGS = /^(?:async\s+)?(function)?\s*[^\(]*\(\s*([^\)]*)\)/m, FN_ARG_SPLIT = /,/, FN_ARG = /(=.+)?(\s*)$/, STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/gm;
+                    DLL.prototype.removeLink = function(node) {
+                        return node.prev ? node.prev.next = node.next : this.head = node.next, node.next ? node.next.prev = node.prev : this.tail = node.prev, 
+                        node.prev = node.next = null, this.length -= 1, node;
+                    }, DLL.prototype.empty = function() {
+                        for (;this.head; ) this.shift();
+                        return this;
+                    }, DLL.prototype.insertAfter = function(node, newNode) {
+                        newNode.prev = node, newNode.next = node.next, node.next ? node.next.prev = newNode : this.tail = newNode, 
+                        node.next = newNode, this.length += 1;
+                    }, DLL.prototype.insertBefore = function(node, newNode) {
+                        newNode.prev = node.prev, newNode.next = node, node.prev ? node.prev.next = newNode : this.head = newNode, 
+                        node.prev = newNode, this.length += 1;
+                    }, DLL.prototype.unshift = function(node) {
+                        this.head ? this.insertBefore(this.head, node) : setInitial(this, node);
+                    }, DLL.prototype.push = function(node) {
+                        this.tail ? this.insertAfter(this.tail, node) : setInitial(this, node);
+                    }, DLL.prototype.shift = function() {
+                        return this.head && this.removeLink(this.head);
+                    }, DLL.prototype.pop = function() {
+                        return this.tail && this.removeLink(this.tail);
+                    }, DLL.prototype.toArray = function() {
+                        for (var arr = Array(this.length), curr = this.head, idx = 0; idx < this.length; idx++) arr[idx] = curr.data, 
+                        curr = curr.next;
+                        return arr;
+                    }, DLL.prototype.remove = function(testFn) {
+                        for (var curr = this.head; curr; ) {
+                            var next = curr.next;
+                            testFn(curr) && this.removeLink(curr), curr = next;
+                        }
+                        return this;
+                    };
+                    var _defer$1, eachOfSeries = doLimit(eachOfLimit, 1), compose = function() {
+                        return seq.apply(null, slice(arguments).reverse());
+                    }, _concat = Array.prototype.concat, concatLimit = function(coll, limit, iteratee, callback) {
+                        callback = callback || noop;
+                        var _iteratee = wrapAsync(iteratee);
+                        mapLimit(coll, limit, function(val, callback) {
+                            _iteratee(val, function(err) {
+                                return err ? callback(err) : callback(null, slice(arguments, 1));
+                            });
+                        }, function(err, mapResults) {
+                            for (var result = [], i = 0; i < mapResults.length; i++) mapResults[i] && (result = _concat.apply(result, mapResults[i]));
+                            return callback(err, result);
+                        });
+                    }, concat = doLimit(concatLimit, 1 / 0), concatSeries = doLimit(concatLimit, 1), constant = function() {
+                        var values = slice(arguments), args = [ null ].concat(values);
+                        return function() {
+                            var callback = arguments[arguments.length - 1];
+                            return callback.apply(this, args);
+                        };
+                    }, detect = doParallel(_createTester(identity, _findGetResult)), detectLimit = doParallelLimit(_createTester(identity, _findGetResult)), detectSeries = doLimit(detectLimit, 1), dir = consoleFunc("dir"), eachSeries = doLimit(eachLimit$1, 1), every = doParallel(_createTester(notId, notId)), everyLimit = doParallelLimit(_createTester(notId, notId)), everySeries = doLimit(everyLimit, 1), filter = doParallel(_filter), filterLimit = doParallelLimit(_filter), filterSeries = doLimit(filterLimit, 1), groupByLimit = function(coll, limit, iteratee, callback) {
+                        callback = callback || noop;
+                        var _iteratee = wrapAsync(iteratee);
+                        mapLimit(coll, limit, function(val, callback) {
+                            _iteratee(val, function(err, key) {
+                                return err ? callback(err) : callback(null, {
+                                    key: key,
+                                    val: val
+                                });
+                            });
+                        }, function(err, mapResults) {
+                            for (var result = {}, hasOwnProperty = Object.prototype.hasOwnProperty, i = 0; i < mapResults.length; i++) if (mapResults[i]) {
+                                var key = mapResults[i].key, val = mapResults[i].val;
+                                hasOwnProperty.call(result, key) ? result[key].push(val) : result[key] = [ val ];
+                            }
+                            return callback(err, result);
+                        });
+                    }, groupBy = doLimit(groupByLimit, 1 / 0), groupBySeries = doLimit(groupByLimit, 1), log = consoleFunc("log"), mapValues = doLimit(mapValuesLimit, 1 / 0), mapValuesSeries = doLimit(mapValuesLimit, 1);
+                    _defer$1 = hasNextTick ? process.nextTick : hasSetImmediate ? setImmediate : fallback;
+                    var nextTick = wrap(_defer$1), queue$1 = function(worker, concurrency) {
+                        var _worker = wrapAsync(worker);
+                        return queue(function(items, cb) {
+                            _worker(items[0], cb);
+                        }, concurrency, 1);
+                    }, priorityQueue = function(worker, concurrency) {
+                        var q = queue$1(worker, concurrency);
+                        return q.push = function(data, priority, callback) {
+                            if (null == callback && (callback = noop), "function" != typeof callback) throw new Error("task callback must be a function");
+                            if (q.started = !0, isArray(data) || (data = [ data ]), 0 === data.length) return setImmediate$1(function() {
+                                q.drain();
+                            });
+                            priority = priority || 0;
+                            for (var nextNode = q._tasks.head; nextNode && priority >= nextNode.priority; ) nextNode = nextNode.next;
+                            for (var i = 0, l = data.length; i < l; i++) {
+                                var item = {
+                                    data: data[i],
+                                    priority: priority,
+                                    callback: callback
+                                };
+                                nextNode ? q._tasks.insertBefore(nextNode, item) : q._tasks.push(item);
+                            }
+                            setImmediate$1(q.process);
+                        }, delete q.unshift, q;
+                    }, reject = doParallel(reject$1), rejectLimit = doParallelLimit(reject$1), rejectSeries = doLimit(rejectLimit, 1), retryable = function(opts, task) {
+                        task || (task = opts, opts = null);
+                        var _task = wrapAsync(task);
+                        return initialParams(function(args, callback) {
+                            function taskFn(cb) {
+                                _task.apply(null, args.concat(cb));
+                            }
+                            opts ? retry(opts, taskFn, callback) : retry(taskFn, callback);
+                        });
+                    }, some = doParallel(_createTester(Boolean, identity)), someLimit = doParallelLimit(_createTester(Boolean, identity)), someSeries = doLimit(someLimit, 1), nativeCeil = Math.ceil, nativeMax = Math.max, times = doLimit(timeLimit, 1 / 0), timesSeries = doLimit(timeLimit, 1), waterfall = function(tasks, callback) {
+                        function nextTask(args) {
+                            var task = wrapAsync(tasks[taskIndex++]);
+                            args.push(onlyOnce(next)), task.apply(null, args);
+                        }
+                        function next(err) {
+                            return err || taskIndex === tasks.length ? callback.apply(null, arguments) : void nextTask(slice(arguments, 1));
+                        }
+                        if (callback = once(callback || noop), !isArray(tasks)) return callback(new Error("First argument to waterfall must be an array of functions"));
+                        if (!tasks.length) return callback();
+                        var taskIndex = 0;
+                        nextTask([]);
+                    }, index = {
+                        apply: apply,
+                        applyEach: applyEach,
+                        applyEachSeries: applyEachSeries,
+                        asyncify: asyncify,
+                        auto: auto,
+                        autoInject: autoInject,
+                        cargo: cargo,
+                        compose: compose,
+                        concat: concat,
+                        concatLimit: concatLimit,
+                        concatSeries: concatSeries,
+                        constant: constant,
+                        detect: detect,
+                        detectLimit: detectLimit,
+                        detectSeries: detectSeries,
+                        dir: dir,
+                        doDuring: doDuring,
+                        doUntil: doUntil,
+                        doWhilst: doWhilst,
+                        during: during,
+                        each: eachLimit,
+                        eachLimit: eachLimit$1,
+                        eachOf: eachOf,
+                        eachOfLimit: eachOfLimit,
+                        eachOfSeries: eachOfSeries,
+                        eachSeries: eachSeries,
+                        ensureAsync: ensureAsync,
+                        every: every,
+                        everyLimit: everyLimit,
+                        everySeries: everySeries,
+                        filter: filter,
+                        filterLimit: filterLimit,
+                        filterSeries: filterSeries,
+                        forever: forever,
+                        groupBy: groupBy,
+                        groupByLimit: groupByLimit,
+                        groupBySeries: groupBySeries,
+                        log: log,
+                        map: map,
+                        mapLimit: mapLimit,
+                        mapSeries: mapSeries,
+                        mapValues: mapValues,
+                        mapValuesLimit: mapValuesLimit,
+                        mapValuesSeries: mapValuesSeries,
+                        memoize: memoize,
+                        nextTick: nextTick,
+                        parallel: parallelLimit,
+                        parallelLimit: parallelLimit$1,
+                        priorityQueue: priorityQueue,
+                        queue: queue$1,
+                        race: race,
+                        reduce: reduce,
+                        reduceRight: reduceRight,
+                        reflect: reflect,
+                        reflectAll: reflectAll,
+                        reject: reject,
+                        rejectLimit: rejectLimit,
+                        rejectSeries: rejectSeries,
+                        retry: retry,
+                        retryable: retryable,
+                        seq: seq,
+                        series: series,
+                        setImmediate: setImmediate$1,
+                        some: some,
+                        someLimit: someLimit,
+                        someSeries: someSeries,
+                        sortBy: sortBy,
+                        timeout: timeout,
+                        times: times,
+                        timesLimit: timeLimit,
+                        timesSeries: timesSeries,
+                        transform: transform,
+                        tryEach: tryEach,
+                        unmemoize: unmemoize,
+                        until: until,
+                        waterfall: waterfall,
+                        whilst: whilst,
+                        all: every,
+                        allLimit: everyLimit,
+                        allSeries: everySeries,
+                        any: some,
+                        anyLimit: someLimit,
+                        anySeries: someSeries,
+                        find: detect,
+                        findLimit: detectLimit,
+                        findSeries: detectSeries,
+                        forEach: eachLimit,
+                        forEachSeries: eachSeries,
+                        forEachLimit: eachLimit$1,
+                        forEachOf: eachOf,
+                        forEachOfSeries: eachOfSeries,
+                        forEachOfLimit: eachOfLimit,
+                        inject: reduce,
+                        foldl: reduce,
+                        foldr: reduceRight,
+                        select: filter,
+                        selectLimit: filterLimit,
+                        selectSeries: filterSeries,
+                        wrapSync: asyncify
+                    };
+                    exports["default"] = index, exports.apply = apply, exports.applyEach = applyEach, 
+                    exports.applyEachSeries = applyEachSeries, exports.asyncify = asyncify, exports.auto = auto, 
+                    exports.autoInject = autoInject, exports.cargo = cargo, exports.compose = compose, 
+                    exports.concat = concat, exports.concatLimit = concatLimit, exports.concatSeries = concatSeries, 
+                    exports.constant = constant, exports.detect = detect, exports.detectLimit = detectLimit, 
+                    exports.detectSeries = detectSeries, exports.dir = dir, exports.doDuring = doDuring, 
+                    exports.doUntil = doUntil, exports.doWhilst = doWhilst, exports.during = during, 
+                    exports.each = eachLimit, exports.eachLimit = eachLimit$1, exports.eachOf = eachOf, 
+                    exports.eachOfLimit = eachOfLimit, exports.eachOfSeries = eachOfSeries, exports.eachSeries = eachSeries, 
+                    exports.ensureAsync = ensureAsync, exports.every = every, exports.everyLimit = everyLimit, 
+                    exports.everySeries = everySeries, exports.filter = filter, exports.filterLimit = filterLimit, 
+                    exports.filterSeries = filterSeries, exports.forever = forever, exports.groupBy = groupBy, 
+                    exports.groupByLimit = groupByLimit, exports.groupBySeries = groupBySeries, exports.log = log, 
+                    exports.map = map, exports.mapLimit = mapLimit, exports.mapSeries = mapSeries, exports.mapValues = mapValues, 
+                    exports.mapValuesLimit = mapValuesLimit, exports.mapValuesSeries = mapValuesSeries, 
+                    exports.memoize = memoize, exports.nextTick = nextTick, exports.parallel = parallelLimit, 
+                    exports.parallelLimit = parallelLimit$1, exports.priorityQueue = priorityQueue, 
+                    exports.queue = queue$1, exports.race = race, exports.reduce = reduce, exports.reduceRight = reduceRight, 
+                    exports.reflect = reflect, exports.reflectAll = reflectAll, exports.reject = reject, 
+                    exports.rejectLimit = rejectLimit, exports.rejectSeries = rejectSeries, exports.retry = retry, 
+                    exports.retryable = retryable, exports.seq = seq, exports.series = series, exports.setImmediate = setImmediate$1, 
+                    exports.some = some, exports.someLimit = someLimit, exports.someSeries = someSeries, 
+                    exports.sortBy = sortBy, exports.timeout = timeout, exports.times = times, exports.timesLimit = timeLimit, 
+                    exports.timesSeries = timesSeries, exports.transform = transform, exports.tryEach = tryEach, 
+                    exports.unmemoize = unmemoize, exports.until = until, exports.waterfall = waterfall, 
+                    exports.whilst = whilst, exports.all = every, exports.allLimit = everyLimit, exports.allSeries = everySeries, 
+                    exports.any = some, exports.anyLimit = someLimit, exports.anySeries = someSeries, 
+                    exports.find = detect, exports.findLimit = detectLimit, exports.findSeries = detectSeries, 
+                    exports.forEach = eachLimit, exports.forEachSeries = eachSeries, exports.forEachLimit = eachLimit$1, 
+                    exports.forEachOf = eachOf, exports.forEachOfSeries = eachOfSeries, exports.forEachOfLimit = eachOfLimit, 
+                    exports.inject = reduce, exports.foldl = reduce, exports.foldr = reduceRight, exports.select = filter, 
+                    exports.selectLimit = filterLimit, exports.selectSeries = filterSeries, exports.wrapSync = asyncify, 
+                    Object.defineProperty(exports, "__esModule", {
+                        value: !0
                     });
-                }), compose = rest(function(args) {
-                    return seq.apply(null, args.reverse());
-                }), eachOf = doLimit(eachOfLimit, 1 / 0), concat = doParallel(concat$1), concatSeries = doSeries(concat$1), constant = rest(function(values) {
-                    var args = [ null ].concat(values);
-                    return initialParams(function(ignoredArgs, callback) {
-                        return callback.apply(this, args);
-                    });
-                }), detect = _createTester(eachOf, identity, _findGetResult), detectLimit = _createTester(eachOfLimit, identity, _findGetResult), detectSeries = _createTester(eachOfSeries, identity, _findGetResult), dir = consoleFunc("dir"), each = doLimit(eachLimit, 1 / 0), eachSeries = doLimit(eachLimit, 1), everyLimit = _createTester(eachOfLimit, notId, notId), every = doLimit(everyLimit, 1 / 0), everySeries = doLimit(everyLimit, 1), filterLimit = doParallelLimit(_filter), filter = doLimit(filterLimit, 1 / 0), filterSeries = doLimit(filterLimit, 1), log = consoleFunc("log"), mapValues = doLimit(mapValuesLimit, 1 / 0), mapValuesSeries = doLimit(mapValuesLimit, 1);
-                _defer$1 = hasNextTick ? process.nextTick : hasSetImmediate ? setImmediate : fallback;
-                var nextTick = wrap(_defer$1), parallel = doLimit(parallelLimit, 1 / 0), slice = Array.prototype.slice, rejectLimit = doParallelLimit(reject$1), reject = doLimit(rejectLimit, 1 / 0), rejectSeries = doLimit(rejectLimit, 1), someLimit = _createTester(eachOfLimit, Boolean, identity), some = doLimit(someLimit, 1 / 0), someSeries = doLimit(someLimit, 1), nativeCeil = Math.ceil, nativeMax$1 = Math.max, times = doLimit(timeLimit, 1 / 0), timesSeries = doLimit(timeLimit, 1), index = {
-                    applyEach: applyEach,
-                    applyEachSeries: applyEachSeries,
-                    apply: apply$1,
-                    asyncify: asyncify,
-                    auto: auto,
-                    autoInject: autoInject,
-                    cargo: cargo,
-                    compose: compose,
-                    concat: concat,
-                    concatSeries: concatSeries,
-                    constant: constant,
-                    detect: detect,
-                    detectLimit: detectLimit,
-                    detectSeries: detectSeries,
-                    dir: dir,
-                    doDuring: doDuring,
-                    doUntil: doUntil,
-                    doWhilst: doWhilst,
-                    during: during,
-                    each: each,
-                    eachLimit: eachLimit,
-                    eachOf: eachOf,
-                    eachOfLimit: eachOfLimit,
-                    eachOfSeries: eachOfSeries,
-                    eachSeries: eachSeries,
-                    ensureAsync: ensureAsync,
-                    every: every,
-                    everyLimit: everyLimit,
-                    everySeries: everySeries,
-                    filter: filter,
-                    filterLimit: filterLimit,
-                    filterSeries: filterSeries,
-                    forever: forever,
-                    log: log,
-                    map: map,
-                    mapLimit: mapLimit,
-                    mapSeries: mapSeries,
-                    mapValues: mapValues,
-                    mapValuesLimit: mapValuesLimit,
-                    mapValuesSeries: mapValuesSeries,
-                    memoize: memoize,
-                    nextTick: nextTick,
-                    parallel: parallel,
-                    parallelLimit: parallelLimit,
-                    priorityQueue: priorityQueue,
-                    queue: queue$1,
-                    race: race,
-                    reduce: reduce,
-                    reduceRight: reduceRight,
-                    reflect: reflect,
-                    reflectAll: reflectAll,
-                    reject: reject,
-                    rejectLimit: rejectLimit,
-                    rejectSeries: rejectSeries,
-                    retry: retry,
-                    retryable: retryable,
-                    seq: seq,
-                    series: series,
-                    setImmediate: setImmediate$1,
-                    some: some,
-                    someLimit: someLimit,
-                    someSeries: someSeries,
-                    sortBy: sortBy,
-                    timeout: timeout,
-                    times: times,
-                    timesLimit: timeLimit,
-                    timesSeries: timesSeries,
-                    transform: transform,
-                    unmemoize: unmemoize,
-                    until: until,
-                    waterfall: waterfall,
-                    whilst: whilst,
-                    all: every,
-                    any: some,
-                    forEach: each,
-                    forEachSeries: eachSeries,
-                    forEachLimit: eachLimit,
-                    forEachOf: eachOf,
-                    forEachOfSeries: eachOfSeries,
-                    forEachOfLimit: eachOfLimit,
-                    inject: reduce,
-                    foldl: reduce,
-                    foldr: reduceRight,
-                    select: filter,
-                    selectLimit: filterLimit,
-                    selectSeries: filterSeries,
-                    wrapSync: asyncify
-                };
-                exports["default"] = index, exports.applyEach = applyEach, exports.applyEachSeries = applyEachSeries, 
-                exports.apply = apply$1, exports.asyncify = asyncify, exports.auto = auto, exports.autoInject = autoInject, 
-                exports.cargo = cargo, exports.compose = compose, exports.concat = concat, exports.concatSeries = concatSeries, 
-                exports.constant = constant, exports.detect = detect, exports.detectLimit = detectLimit, 
-                exports.detectSeries = detectSeries, exports.dir = dir, exports.doDuring = doDuring, 
-                exports.doUntil = doUntil, exports.doWhilst = doWhilst, exports.during = during, 
-                exports.each = each, exports.eachLimit = eachLimit, exports.eachOf = eachOf, exports.eachOfLimit = eachOfLimit, 
-                exports.eachOfSeries = eachOfSeries, exports.eachSeries = eachSeries, exports.ensureAsync = ensureAsync, 
-                exports.every = every, exports.everyLimit = everyLimit, exports.everySeries = everySeries, 
-                exports.filter = filter, exports.filterLimit = filterLimit, exports.filterSeries = filterSeries, 
-                exports.forever = forever, exports.log = log, exports.map = map, exports.mapLimit = mapLimit, 
-                exports.mapSeries = mapSeries, exports.mapValues = mapValues, exports.mapValuesLimit = mapValuesLimit, 
-                exports.mapValuesSeries = mapValuesSeries, exports.memoize = memoize, exports.nextTick = nextTick, 
-                exports.parallel = parallel, exports.parallelLimit = parallelLimit, exports.priorityQueue = priorityQueue, 
-                exports.queue = queue$1, exports.race = race, exports.reduce = reduce, exports.reduceRight = reduceRight, 
-                exports.reflect = reflect, exports.reflectAll = reflectAll, exports.reject = reject, 
-                exports.rejectLimit = rejectLimit, exports.rejectSeries = rejectSeries, exports.retry = retry, 
-                exports.retryable = retryable, exports.seq = seq, exports.series = series, exports.setImmediate = setImmediate$1, 
-                exports.some = some, exports.someLimit = someLimit, exports.someSeries = someSeries, 
-                exports.sortBy = sortBy, exports.timeout = timeout, exports.times = times, exports.timesLimit = timeLimit, 
-                exports.timesSeries = timesSeries, exports.transform = transform, exports.unmemoize = unmemoize, 
-                exports.until = until, exports.waterfall = waterfall, exports.whilst = whilst, exports.all = every, 
-                exports.allLimit = everyLimit, exports.allSeries = everySeries, exports.any = some, 
-                exports.anyLimit = someLimit, exports.anySeries = someSeries, exports.find = detect, 
-                exports.findLimit = detectLimit, exports.findSeries = detectSeries, exports.forEach = each, 
-                exports.forEachSeries = eachSeries, exports.forEachLimit = eachLimit, exports.forEachOf = eachOf, 
-                exports.forEachOfSeries = eachOfSeries, exports.forEachOfLimit = eachOfLimit, exports.inject = reduce, 
-                exports.foldl = reduce, exports.foldr = reduceRight, exports.select = filter, exports.selectLimit = filterLimit, 
-                exports.selectSeries = filterSeries, exports.wrapSync = asyncify;
-            });
-        }).call(this, require("_process"), "undefined" != typeof global ? global : "undefined" != typeof self ? self : "undefined" != typeof window ? window : {});
+                });
+            }).call(this);
+        }).call(this, require("_process"), "undefined" != typeof global ? global : "undefined" != typeof self ? self : "undefined" != typeof window ? window : {}, require("timers").setImmediate);
     }, {
-        _process: 8
+        _process: 8,
+        timers: 10
     } ],
     6: [ function(require, module, exports) {
         !function(glob) {
@@ -2167,19 +2300,53 @@ var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator 
         }();
     }, {} ],
     8: [ function(require, module, exports) {
+        function defaultSetTimout() {
+            throw new Error("setTimeout has not been defined");
+        }
+        function defaultClearTimeout() {
+            throw new Error("clearTimeout has not been defined");
+        }
+        function runTimeout(fun) {
+            if (cachedSetTimeout === setTimeout) return setTimeout(fun, 0);
+            if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) return cachedSetTimeout = setTimeout, 
+            setTimeout(fun, 0);
+            try {
+                return cachedSetTimeout(fun, 0);
+            } catch (e) {
+                try {
+                    return cachedSetTimeout.call(null, fun, 0);
+                } catch (e) {
+                    return cachedSetTimeout.call(this, fun, 0);
+                }
+            }
+        }
+        function runClearTimeout(marker) {
+            if (cachedClearTimeout === clearTimeout) return clearTimeout(marker);
+            if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) return cachedClearTimeout = clearTimeout, 
+            clearTimeout(marker);
+            try {
+                return cachedClearTimeout(marker);
+            } catch (e) {
+                try {
+                    return cachedClearTimeout.call(null, marker);
+                } catch (e) {
+                    return cachedClearTimeout.call(this, marker);
+                }
+            }
+        }
         function cleanUpNextTick() {
             draining && currentQueue && (draining = !1, currentQueue.length ? queue = currentQueue.concat(queue) : queueIndex = -1, 
             queue.length && drainQueue());
         }
         function drainQueue() {
             if (!draining) {
-                var timeout = cachedSetTimeout(cleanUpNextTick);
+                var timeout = runTimeout(cleanUpNextTick);
                 draining = !0;
                 for (var len = queue.length; len; ) {
                     for (currentQueue = queue, queue = []; ++queueIndex < len; ) currentQueue && currentQueue[queueIndex].run();
                     queueIndex = -1, len = queue.length;
                 }
-                currentQueue = null, draining = !1, cachedClearTimeout(timeout);
+                currentQueue = null, draining = !1, runClearTimeout(timeout);
             }
         }
         function Item(fun, array) {
@@ -2189,31 +2356,30 @@ var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator 
         var cachedSetTimeout, cachedClearTimeout, process = module.exports = {};
         !function() {
             try {
-                cachedSetTimeout = setTimeout;
+                cachedSetTimeout = "function" == typeof setTimeout ? setTimeout : defaultSetTimout;
             } catch (e) {
-                cachedSetTimeout = function() {
-                    throw new Error("setTimeout is not defined");
-                };
+                cachedSetTimeout = defaultSetTimout;
             }
             try {
-                cachedClearTimeout = clearTimeout;
+                cachedClearTimeout = "function" == typeof clearTimeout ? clearTimeout : defaultClearTimeout;
             } catch (e) {
-                cachedClearTimeout = function() {
-                    throw new Error("clearTimeout is not defined");
-                };
+                cachedClearTimeout = defaultClearTimeout;
             }
         }();
         var currentQueue, queue = [], draining = !1, queueIndex = -1;
         process.nextTick = function(fun) {
             var args = new Array(arguments.length - 1);
             if (arguments.length > 1) for (var i = 1; i < arguments.length; i++) args[i - 1] = arguments[i];
-            queue.push(new Item(fun, args)), 1 !== queue.length || draining || cachedSetTimeout(drainQueue, 0);
+            queue.push(new Item(fun, args)), 1 !== queue.length || draining || runTimeout(drainQueue);
         }, Item.prototype.run = function() {
             this.fun.apply(null, this.array);
         }, process.title = "browser", process.browser = !0, process.env = {}, process.argv = [], 
         process.version = "", process.versions = {}, process.on = noop, process.addListener = noop, 
         process.once = noop, process.off = noop, process.removeListener = noop, process.removeAllListeners = noop, 
-        process.emit = noop, process.binding = function(name) {
+        process.emit = noop, process.prependListener = noop, process.prependOnceListener = noop, 
+        process.listeners = function(name) {
+            return [];
+        }, process.binding = function(name) {
             throw new Error("process.binding is not supported");
         }, process.cwd = function() {
             return "/";
@@ -5023,5 +5189,44 @@ var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator 
         });
     }, {
         eve: 6
+    } ],
+    10: [ function(require, module, exports) {
+        (function(setImmediate, clearImmediate) {
+            (function() {
+                function Timeout(id, clearFn) {
+                    this._id = id, this._clearFn = clearFn;
+                }
+                var nextTick = require("process/browser.js").nextTick, apply = Function.prototype.apply, slice = Array.prototype.slice, immediateIds = {}, nextImmediateId = 0;
+                exports.setTimeout = function() {
+                    return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+                }, exports.setInterval = function() {
+                    return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+                }, exports.clearTimeout = exports.clearInterval = function(timeout) {
+                    timeout.close();
+                }, Timeout.prototype.unref = Timeout.prototype.ref = function() {}, Timeout.prototype.close = function() {
+                    this._clearFn.call(window, this._id);
+                }, exports.enroll = function(item, msecs) {
+                    clearTimeout(item._idleTimeoutId), item._idleTimeout = msecs;
+                }, exports.unenroll = function(item) {
+                    clearTimeout(item._idleTimeoutId), item._idleTimeout = -1;
+                }, exports._unrefActive = exports.active = function(item) {
+                    clearTimeout(item._idleTimeoutId);
+                    var msecs = item._idleTimeout;
+                    msecs >= 0 && (item._idleTimeoutId = setTimeout(function() {
+                        item._onTimeout && item._onTimeout();
+                    }, msecs));
+                }, exports.setImmediate = "function" == typeof setImmediate ? setImmediate : function(fn) {
+                    var id = nextImmediateId++, args = !(arguments.length < 2) && slice.call(arguments, 1);
+                    return immediateIds[id] = !0, nextTick(function() {
+                        immediateIds[id] && (args ? fn.apply(null, args) : fn.call(null), exports.clearImmediate(id));
+                    }), id;
+                }, exports.clearImmediate = "function" == typeof clearImmediate ? clearImmediate : function(id) {
+                    delete immediateIds[id];
+                };
+            }).call(this);
+        }).call(this, require("timers").setImmediate, require("timers").clearImmediate);
+    }, {
+        "process/browser.js": 8,
+        timers: 10
     } ]
 }, {}, [ 1 ]);
